@@ -516,6 +516,7 @@ for i,v in pairs(maps:GetChildren()) do
 		selected.Text = button.Name
 		Test.Primary = button.Name
 		menu.Author.Text = button.Author.Text
+		menu.Mapper.Text = button.Mapper.Text
 		script.Parent.Main.Grade.Frame.MapName.Text = button.Name
 		script.Parent.Main.Grade.Frame.Beatmap.Text = current.mapper
 	end)
