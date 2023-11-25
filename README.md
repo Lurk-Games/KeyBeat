@@ -1,3 +1,8 @@
+<p align="center">
+  <img width="500" alt="KeyBeat logo" src="assets/GameIconTransparent.png">
+</p>
+
+
 # KeyBeat
 KeyBeat is a free-to-win Roblox rhythm game and it's now open source.
 
