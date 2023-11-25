@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="500" alt="KeyBeat logo" src="Zdjęcia\GameIcon.png">
+  <img width="500" alt="KeyBeat logo" src="[Zdjęcia\GameIcon.png](https://cdn.discordapp.com/attachments/904334033226440735/1177893264775458916/GameIcon.png?ex=65742996&is=6561b496&hm=51fea79eb5708dc08f5b9a663a5911716c1e9565aef65e373366e46004907563&)">
 </p>
 
 # KeyBeat
