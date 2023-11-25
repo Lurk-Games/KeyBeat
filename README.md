@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="500" alt="KeyBeat logo" src="F:\Zdjęcia\GameIcon.png">
+  <img width="500" alt="KeyBeat logo" src="Zdjęcia\GameIcon.png">
 </p>
 
 # KeyBeat
