@@ -49,15 +49,12 @@ While pull requests from unaffiliated contributors are welcome, please note that
 
 In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
 
-If you'd like to propose a subjective change to one of the visual aspects of the game, or there is a bigger task you'd like to work on, but there is no corresponding issue or discussion thread yet for it, **please open a discussion or issue first** to avoid wasted effort. This in particular applies if you want to work on [one of the available designs from the osu! Figma master library](https://www.figma.com/file/VIkXMYNPMtQem2RJg9k2iQ/Master-Library).
-
 Aside from the above, below is a brief checklist of things to watch out when you're preparing your code changes:
 
 - Make sure you're comfortable with the principles of object-oriented programming, the syntax of C\# and your development environment.
 - Make sure you are familiar with [git](https://git-scm.com/) and [the pull request workflow](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/proposing-changes-to-your-work-with-pull-requests).
 - Please do not make code changes via the GitHub web interface.
 - Please add tests for your changes. We expect most new features and bugfixes to have test coverage, unless the effort of adding them is prohibitive.
-- Please run tests and code style analysis (via `InspectCode.{ps1,sh}` scripts in the root of this repository) before opening the PR. This is particularly important if you're a first-time contributor, as CI will not run for your PR until we allow it to do so.
 
 After you're done with your changes and you wish to open the PR, please observe the following recommendations:
 
