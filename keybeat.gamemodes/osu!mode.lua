@@ -14,6 +14,7 @@ local user = game:GetService("UserInputService")
 local tween = game:GetService("TweenService")
 local run = game:GetService("RunService")
 
+local countdown = gameui.Countdown
 local maps = replicated.Maps
 local resources = replicated.Resources
 
