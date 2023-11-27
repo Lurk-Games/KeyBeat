@@ -6,6 +6,7 @@ module.credits = "By:Lurk Games"
 module.mapper = "Mapped by:Lurk Games"
 module.difficulty = "Difficulty: Easy"
 module.category = "Original"
+module.ranked = false
 module.scrollspeed = 1
 
 module.notes = {
