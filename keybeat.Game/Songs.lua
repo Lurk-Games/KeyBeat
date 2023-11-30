@@ -12,6 +12,7 @@ local countdown = gameui.Countdown
 local background = holder.Background
 local notes = holder.Notes
 local trigger = background.Trigger
+local preview = workspace.Preview
 
 local mainui = script.Parent.Main
 local menu = mainui.SongMenu
@@ -220,6 +221,7 @@ function start()
 	
 	script.Parent.Game.Thumbnail.Image = current.thumbnail
 	script.Parent.Main.Grade.ImageLabel.Image = current.thumbnail
+	preview:Stop()
 	if replicated.Settings.MapSpeed.Value == true then
 		scrollspeed = current.scrollspeed
 	elseif replicated.Settings.MapSpeed.Value == false then
@@ -276,17 +278,17 @@ function reset()
 		v:Destroy()
 	end
 	workspace.Music:Stop()
-	if game.Players.LocalPlayer.Modifiers.Disco.Value == true then
-		replicated.Score.PointHolder.Value *= 2
-		game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
-	else
-		game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
-	end
-	if game.Players.LocalPlayer.Modifiers.NF.Value == true then
-		game.Players.LocalPlayer.leaderstats.Points.Value += math.floor(replicated.Score.PointHolder.Value / 2)
-	else
-		game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
-	end
+	--if game.Players.LocalPlayer.Modifiers.Disco.Value == true then
+		--replicated.Score.PointHolder.Value *= 2
+		--game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
+	--else
+		--game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
+	--end
+	--if game.Players.LocalPlayer.Modifiers.NF.Value == true then
+		--game.Players.LocalPlayer.leaderstats.Points.Value += math.floor(replicated.Score.PointHolder.Value / 2)
+	--else
+		--game.Players.LocalPlayer.leaderstats.Points.Value += replicated.Score.PointHolder.Value
+	--end
 	replicated.Score.PointHolder.Value = 0
 	game.Players.LocalPlayer.leaderstats.Hidden.EXP.Value += 100
 	
@@ -342,6 +344,7 @@ run.RenderStepped:Connect(function(delta)
 						score -= 10
 						gameui.Stats.Score.Text = score
 						gameui.Combo.Text = combo
+						workspace.Miss:Play()
 						v:Destroy()
 					end
 				else
@@ -360,6 +363,7 @@ run.RenderStepped:Connect(function(delta)
 						score -= 10
 						gameui.Stats.Score.Text = score
 						gameui.Combo.Text = combo
+						workspace.Miss:Play()
 						v:Destroy()
 					end
 				end
@@ -379,6 +383,7 @@ run.RenderStepped:Connect(function(delta)
 					score -= 10
 					gameui.Stats.Score.Text = score
 					gameui.Combo.Text = combo
+					workspace.Miss:Play()
 					v:Destroy()
 				end
 			end
@@ -451,6 +456,7 @@ user.InputEnded:Connect(function(input)
 end)
 
 character:WaitForChild("Humanoid").Died:Connect(function()
+	workspace.Fail:Play()
 	reset()
 end)
 
@@ -473,6 +479,8 @@ for i,v in pairs(maps:GetChildren()) do
 	button.Visible = true
 	current = require(maps[v.Name])
 	button.Parent = songs[current.category]
+	preview.SoundId = "rbxassetid://" .. current.id
+	preview:Play()
 	button.Song.Text = v.Name
 	button.Image = current.thumbnail
 	button.Author.Text = current.credits
