@@ -45,7 +45,7 @@ When in doubt, it's probably best to start with a discussion first. We will esca
 
 ## Submitting pull requests
 
-While pull requests from unaffiliated contributors are welcome, please note that due to significant community interest and limited review throughput, the core team's primary focus is on the issues which are currently [on the roadmap](https://github.com/users/Virus01Official/projects/6/views/1). Reviewing PRs that fall outside of the scope of the roadmap is done on a best-effort basis, so please be aware that it may take a while before a core maintainer gets around to review your change.
+While pull requests from unaffiliated contributors are welcome, please note that due to significant community interest and limited review throughput, the core team's primary focus is on the issues which are currently [on the roadmap](https://github.com/orgs/Lurk-Games/projects/1/views/1). Reviewing PRs that fall outside of the scope of the roadmap is done on a best-effort basis, so please be aware that it may take a while before a core maintainer gets around to review your change.
 
 In the case of simple issues, a direct PR is okay. However, if you decide to work on an existing issue which doesn't seem trivial, **please ask us first**. This way we can try to estimate if it is a good fit for you and provide the correct direction on how to address it. In addition, note that while we do not rule out external contributors from working on roadmapped issues, we will generally prefer to handle them ourselves unless they're not very time sensitive.
 
