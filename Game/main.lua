@@ -8,19 +8,20 @@ local score = 0
 local misses = 0
 local currentScreen = "song_selection" -- Initially set to song selection
 local selectedSongIndex = 1 -- Index of the currently selected song
-local songStartTime = 0 -- To track when the song started
+local audioDelay = false -- Flag to control audio delay
+local audioStartTime = 0 -- Variable to store the audio start time
 
 -- Define your song list with associated chart and audio file paths
 local songs = {
     {
-        name = "Song 1",
+        name = "Galaxy Collapse",
         chart = "Songs/Galaxy Collapse/chart.txt",
         audio = "Songs/Galaxy Collapse/audio.ogg"
     },
     {
-        name = "Song 2",
-        chart = "Songs/Song2/chart.txt",
-        audio = "Songs/Song2/audio.ogg"
+        name = "Cute Depressed",
+        chart = "Songs/Cute Depressed/chart.txt",
+        audio = "Songs/Cute Depressed/audio.ogg"
     },
     {
         name = "Song 3",
@@ -41,6 +42,16 @@ end
 
 function love.update(dt)
     if currentScreen == "game_menu" then -- Execute game logic only when on game menu
+
+        -- Check for audio delay
+        if audioDelay then
+            local currentTime = love.timer.getTime()
+            if currentTime - audioStartTime >= 1 then -- Delay audio for 1 second
+                music:play() -- Start playing the music after the delay
+                audioDelay = false -- Reset the flag
+            end
+        end
+        
         -- Update notes position
         for i, note in ipairs(notes) do
             note.y = note.y + noteSpeed * dt
@@ -59,6 +70,14 @@ function love.update(dt)
             end
         end
 
+        -- Check if there are any notes left
+        if #notes == 0 and nextNoteIndex > #chart then
+            -- Stop the music after a delay of 1 second
+            audioDelay = true
+            audioStartTime = love.timer.getTime()
+            currentScreen = "waiting_for_music_stop"
+        end
+
         -- Check for note collision with mouse position
         for i, note in ipairs(notes) do
             local mouseX, mouseY = love.mouse.getPosition()
@@ -69,8 +88,19 @@ function love.update(dt)
                 end
             end
         end
+    elseif currentScreen == "waiting_for_music_stop" then
+        -- Check for delay before returning to song selection
+        local currentTime = love.timer.getTime()
+        if currentTime - audioStartTime >= 1 then -- Delay for 1 second
+            -- Stop the music
+            music:stop()
+            -- Change the screen back to song selection
+            currentScreen = "song_selection"
+        end
     end
 end
+
+
 
 function love.draw()
     if currentScreen == "song_selection" then
@@ -137,15 +167,23 @@ function loadSong(song)
     for line in love.filesystem.lines(song.chart) do
         table.insert(chart, tonumber(line))
     end
+    -- Debugging: print loaded chart
+    print("Loaded chart for " .. song.name .. ":")
+    for i, time in ipairs(chart) do
+        print(i, time)
+    end
     
-    -- Load audio
+    -- Load audio without delay
     music = love.audio.newSource(song.audio, "stream") -- the "stream" is good for longer music tracks
     music:setLooping(false) -- Ensure the music doesn't loop
-    music:play() -- Start playing the music
-
+    
     -- Reset notes and indices
     notes = {}
     nextNoteIndex = 1
     score = 0
     misses = 0
+
+    -- Set the flag to delay audio
+    audioDelay = true
+    audioStartTime = love.timer.getTime() -- Record the audio start time
 end
