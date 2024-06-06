@@ -7,6 +7,8 @@ gameState = "menu"  -- make gameState global for access in other modules
 
 function love.load()
     love.graphics.setFont(love.graphics.newFont(20))
+    hitsound = "assets/hitsound.ogg"
+    missSound = "assets/miss.ogg"
     menu.load()
 end
 
