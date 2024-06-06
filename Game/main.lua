@@ -1,4 +1,5 @@
 -- main.lua
+
 local menu = require("menu")
 local game = require("game")
 local settings = require("settings")
@@ -7,8 +8,7 @@ gameState = "menu"  -- make gameState global for access in other modules
 
 function love.load()
     love.graphics.setFont(love.graphics.newFont(20))
-    hitsound = "assets/hitsound.ogg"
-    missSound = "assets/miss.ogg"
+    hitsound = love.audio.newSource("assets/hitsound.ogg","static")
     menu.load()
 end
 
