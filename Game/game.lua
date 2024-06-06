@@ -66,6 +66,7 @@ function game.update(dt)
         if note.y > hitLineY + noteSize + (note.hold and note.holdTime * noteSpeed or 0) then
             table.remove(notes, i)
             misses = misses + 1
+            love.audio.play(missSound)
         end
     end
 
@@ -137,6 +138,7 @@ function game.keypressed(key)
             table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
             table.remove(notes, i)
             score = score + 100
+            love.audio.play(hitsound)
             break
         end
     end
@@ -150,6 +152,7 @@ function game.keyreleased(key)
                     table.insert(hitEffects, {x = activeHoldNote.x, time = hitEffectDuration})
                     table.remove(notes, i)
                     score = score + 100
+                    love.audio.play(hitsound)
                     break
                 end
             end
