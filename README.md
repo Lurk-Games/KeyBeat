@@ -10,3 +10,4 @@ You can support our further development through our Ko-Fi page
 You can contact us through any of those ways:
 
 Twitter: https://x.com/KeyBeat_Dev
+Discord: https://discord.gg/SnAnC4x7VT
