@@ -5,6 +5,7 @@ local settings = require("settings")
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
 local noteSize = 20
+local hitboxSize = 40 -- Increase hitbox size without changing note size
 local hitLineY = 500
 local songTime = 0
 local activeHoldNote = nil
@@ -134,10 +135,10 @@ function game.keypressed(key)
     for i = #notes, 1, -1 do
         local note = notes[i]
         if note.hold then
-            if note.y and note.y >= hitLineY - noteSize and note.y <= hitLineY + noteSize then
+            if note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
                 activeHoldNote = note
             end
-        elseif note.y and note.y >= hitLineY - noteSize and note.y <= hitLineY + noteSize then
+        elseif note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
             table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
             table.remove(notes, i)
             score = score + 100
