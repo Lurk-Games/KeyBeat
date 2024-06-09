@@ -6,6 +6,10 @@ KeyBeat is a rhythm game where you aim and press keys to the beat of the music. 
 
 This project is under constant development, but we do our best to keep things in a stable state. This project will continue to evolve until we eventually reach the point where KeyBeat is gonna be ready for release.
 
+## To-Do list
+You can access the to-do list [here](https://github.com/orgs/ppy/projects/7/views/6).
+
+
 ## Support
 You can support our further development through our Ko-Fi page
 
