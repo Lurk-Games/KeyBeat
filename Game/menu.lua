@@ -5,7 +5,6 @@ local options = {}
 
 function menu.load()
     options = {"Start Game", "Settings"}
-    loadSongs()
 end
 
 function loadSongs()
