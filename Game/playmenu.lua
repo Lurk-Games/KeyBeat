@@ -2,9 +2,15 @@
 local playmenu = {}
 local selectedOption = 1
 local options = {}
+local optionsLoaded = false  -- Flag to check if options have been loaded
+local scrollOffset = 0  -- The current scroll offset
+local visibleOptions = 5  -- Number of options visible at a time
 
 function playmenu.load()
-    loadSongs()
+    if not optionsLoaded then
+        loadSongs()
+        optionsLoaded = true
+    end
 end
 
 function loadSongs()
@@ -37,22 +43,23 @@ function playmenu.update(dt)
 end
 
 function playmenu.draw()
-    love.graphics.printf("Choose an option:", 0, love.graphics.getHeight() / 2 - 150, love.graphics.getWidth(), "center")
-    for i, option in ipairs(options) do
-        if type(option) == "table" then
-            local text = option.name .. " (Credits: " .. option.credits .. ", Difficulty: " .. option.difficulty .. ")"
-            if i == selectedOption then
-                love.graphics.printf("-> " .. text, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
-            else
-                love.graphics.printf(text, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
-            end
+    love.graphics.printf("Choose an option:", 0, 100, love.graphics.getWidth(), "center")
+
+    local startY = 150
+    for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
+        local option = options[i]
+        local bgY = startY + (i - scrollOffset - 1) * 100
+        if i == selectedOption then
+            love.graphics.setColor(0.7, 0.7, 0.7, 1)
         else
-            if i == selectedOption then
-                love.graphics.printf("-> " .. option, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
-            else
-                love.graphics.printf(option, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
-            end
+            love.graphics.setColor(1, 1, 1, 1)
         end
+        love.graphics.rectangle("fill", love.graphics.getWidth() / 4, bgY, love.graphics.getWidth() / 2, 80)
+        
+        love.graphics.setColor(0, 0, 0, 1)
+        love.graphics.printf(option.name, love.graphics.getWidth() / 4, bgY + 10, love.graphics.getWidth() / 2, "center")
+        love.graphics.printf("Credits: " .. option.credits, love.graphics.getWidth() / 4, bgY + 30, love.graphics.getWidth() / 2, "center")
+        love.graphics.printf("Difficulty: " .. option.difficulty, love.graphics.getWidth() / 4, bgY + 50, love.graphics.getWidth() / 2, "center")
     end
 end
 
@@ -62,10 +69,16 @@ function playmenu.keypressed(key)
         if selectedOption < 1 then
             selectedOption = #options
         end
+        if selectedOption <= scrollOffset and scrollOffset > 0 then
+            scrollOffset = scrollOffset - 1
+        end
     elseif key == "down" then
         selectedOption = selectedOption + 1
         if selectedOption > #options then
             selectedOption = 1
+        end
+        if selectedOption > scrollOffset + visibleOptions then
+            scrollOffset = scrollOffset + 1
         end
     elseif key == "return" or key == "space" then
         if options[selectedOption] == "Start Game" then
@@ -77,7 +90,7 @@ function playmenu.keypressed(key)
             startGame(selected.chart, selected.music)
         end
     elseif key == "escape" then
-            backToMenu()
+        backToMenu()
     end
 end
 
