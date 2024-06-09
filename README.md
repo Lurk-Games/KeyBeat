@@ -1,5 +1,12 @@
 # KeyBeat
+
+[![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/VNnZJUeZ96)
+
 KeyBeat is a rhythm game where you aim and press keys to the beat of the music. It's a free-to-win Roblox rhythm game and it's now open sourced. It was made in LÖVE2D
+
+## Status
+
+This project is under constant development, but we do our best to keep things in a stable state. This project will continue to evolve until we eventually reach the point where KeyBeat is gonna be ready for release.
 
 ## Support
 You can support our further development through our Ko-Fi page
@@ -12,3 +19,4 @@ You can contact us through any of those ways:
 Twitter: https://x.com/KeyBeat_Dev
 
 Discord: https://discord.gg/SnAnC4x7VT
+
