@@ -5,7 +5,7 @@ local settings = require("settings")
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
 local noteSize = 20
-local hitboxSize = 40
+local hitboxSize = 40 -- Increase hitbox size without changing note size
 local hitLineY = 500
 local songTime = 0
 local activeHoldNote = nil
@@ -44,7 +44,7 @@ function loadChart(filename)
         time = tonumber(time)
         x = tonumber(x)
         holdTime = tonumber(holdTime)
-        table.insert(notes, {time = time, x = x, hold = holdTime > 0, holdTime = holdTime, y = hitLineY})
+        table.insert(notes, {time = time, x = x, hold = holdTime > 0, holdTime = holdTime})
         chartEndTime = math.max(chartEndTime, time + holdTime)
     end
 end
@@ -132,20 +132,30 @@ function drawTimeBar()
 end
 
 function game.keypressed(key)
+    local hitNotes = {}
     for i = #notes, 1, -1 do
         local note = notes[i]
         if note.hold then
             if note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
                 activeHoldNote = note
+                table.insert(hitNotes, i)
+                table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
+                love.audio.play(hitsound)
             end
         elseif note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
             table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
-            table.remove(notes, i)
-            score = score + 100
-            combo = combo + 1
-            love.audio.play(hitsound)
-            break
+            table.insert(hitNotes, i)
         end
+    end
+
+    -- Process all hit notes at once
+    if #hitNotes > 0 then
+        for _, index in ipairs(hitNotes) do
+            table.remove(notes, index)
+        end
+        score = score + 100 * #hitNotes
+        combo = combo + #hitNotes
+        love.audio.play(hitsound)
     end
 end
 
