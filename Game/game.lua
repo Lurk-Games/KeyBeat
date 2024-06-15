@@ -1,10 +1,9 @@
--- game.lua
 local game = {}
 local settings = require("settings")
 
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
-local noteSize = 20
+local noteSize = settings.getNoteSize()
 local hitboxSize = 40 -- Increase hitbox size without changing note size
 local hitLineY = 500
 local songTime = 0
@@ -19,8 +18,11 @@ local chartEndTime = 0
 local endGameCallback
 local hitEffects = {}
 local hitEffectDuration = 0.2
+local noteImage -- Variable to hold the note image
+local holdNoteImage -- Variable to hold the hold note image
+local hitEffectImage -- Variable to hold the hit effect image
 
-function game.start(chartFile, musicFile, callback)
+function game.start(chartFile, musicFile, callback, skin)
     songTime = 0
     score = 0
     combo = 0
@@ -34,6 +36,12 @@ function game.start(chartFile, musicFile, callback)
     endGameCallback = callback
     hitEffects = {}
     noteSpeed = settings.getNoteSpeed()
+    noteSize = settings.getNoteSize()
+    
+    -- Load the skin images
+    noteImage = love.graphics.newImage("skins/default/Note.png")
+    holdNoteImage = love.graphics.newImage("skins/default/Hold.png")
+    hitEffectImage = love.graphics.newImage("skins/default/Splash.png")
 end
 
 function loadChart(filename)
@@ -97,17 +105,17 @@ function game.draw()
     for _, note in ipairs(notes) do
         if note.y then -- Ensure note.y is not nil
             if note.hold then
-                love.graphics.rectangle("fill", note.x, note.y - noteSpeed * note.holdTime, noteSize, noteSize + noteSpeed * note.holdTime)
+                love.graphics.draw(holdNoteImage, note.x, note.y - noteSpeed * note.holdTime, 0, noteSize / holdNoteImage:getWidth(), (noteSize + noteSpeed * note.holdTime) / holdNoteImage:getHeight())
             else
-                love.graphics.rectangle("fill", note.x, note.y, noteSize, noteSize)
+                love.graphics.draw(noteImage, note.x, note.y, 0, noteSize / noteImage:getWidth(), noteSize / noteImage:getHeight())
             end
         end
     end
 
     -- Draw hit effects
     for _, effect in ipairs(hitEffects) do
-        love.graphics.setColor(1, 1, 0, effect.time / hitEffectDuration) -- Fade out effect
-        love.graphics.circle("fill", effect.x + noteSize / 2, hitLineY, 30)
+        love.graphics.setColor(1, 1, 1, effect.time / hitEffectDuration) -- Fade out effect
+        love.graphics.draw(hitEffectImage, effect.x, hitLineY - noteSize / 2, 0, noteSize / hitEffectImage:getWidth(), noteSize / hitEffectImage:getHeight())
         love.graphics.setColor(1, 1, 1, 1) -- Reset color
     end
 
