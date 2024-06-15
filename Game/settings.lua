@@ -1,10 +1,10 @@
--- settings.lua
 local settings = {}
 
-local options = {"Volume", "Note Speed"}
+local options = {"Volume", "Note Speed", "Note Size"}
 local selectedOption = 1
 local volume = 1
 local noteSpeed = 300
+local noteSize = 20
 
 function settings.load()
     
@@ -23,6 +23,8 @@ function settings.draw()
             value = tostring(math.floor(volume * 100)) .. "%"
         elseif option == "Note Speed" then
             value = tostring(noteSpeed)
+        elseif option == "Note Size" then
+            value = tostring(noteSize)
         end
         
         if i == selectedOption then
@@ -50,6 +52,8 @@ function settings.keypressed(key)
             love.audio.setVolume(volume)
         elseif options[selectedOption] == "Note Speed" then
             noteSpeed = math.max(100, noteSpeed - 50)
+        elseif options[selectedOption] == "Note Size" then
+            noteSize = math.max(10, noteSize - 5)
         end
     elseif key == "right" then
         if options[selectedOption] == "Volume" then
@@ -57,6 +61,8 @@ function settings.keypressed(key)
             love.audio.setVolume(volume)
         elseif options[selectedOption] == "Note Speed" then
             noteSpeed = math.min(1000, noteSpeed + 50)
+        elseif options[selectedOption] == "Note Size" then
+            noteSize = math.min(100, noteSize + 5)
         end
     elseif key == "escape" then
         backToMenu()
@@ -69,6 +75,10 @@ end
 
 function settings.getNoteSpeed()
     return noteSpeed
+end
+
+function settings.getNoteSize()
+    return noteSize
 end
 
 return settings
