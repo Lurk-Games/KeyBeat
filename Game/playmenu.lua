@@ -17,9 +17,19 @@ function loadSongs()
     local songsFolder = "songs"
     for _, folder in ipairs(love.filesystem.getDirectoryItems(songsFolder)) do
         local chartPath = songsFolder .. "/" .. folder .. "/chart.txt"
-        local musicPath = songsFolder .. "/" .. folder .. "/music.ogg"
+        local musicPathMp3 = songsFolder .. "/" .. folder .. "/music.mp3"
+        local musicPathOgg = songsFolder .. "/" .. folder .. "/music.ogg"
+        local musicPath = nil
         local infoPath = songsFolder .. "/" .. folder .. "/info.txt"
-        if love.filesystem.getInfo(chartPath) and love.filesystem.getInfo(musicPath) then
+
+        -- Check if either .mp3 or .ogg file exists
+        if love.filesystem.getInfo(musicPathMp3) then
+            musicPath = musicPathMp3
+        elseif love.filesystem.getInfo(musicPathOgg) then
+            musicPath = musicPathOgg
+        end
+
+        if love.filesystem.getInfo(chartPath) and musicPath then
             local credits, difficulty = "Unknown", "Unknown"
             if love.filesystem.getInfo(infoPath) then
                 local info = love.filesystem.read(infoPath)
@@ -81,14 +91,8 @@ function playmenu.keypressed(key)
             scrollOffset = scrollOffset + 1
         end
     elseif key == "return" or key == "space" then
-        if options[selectedOption] == "Start Game" then
-            selectedOption = 2
-        elseif options[selectedOption] == "Settings" then
-            goToSettings()
-        else
             local selected = options[selectedOption]
             startGame(selected.chart, selected.music)
-        end
     elseif key == "escape" then
         backToMenu()
     end
