@@ -10,7 +10,9 @@ local songTime = 0
 local activeHoldNote = nil
 local score = 0
 local misses = 0
-local combo = 0
+local hits = 0
+local totalNotes = 0
+local accuracy = 100
 local music
 local musicDelay = 1
 local musicStartTime = nil
@@ -26,7 +28,10 @@ function game.start(chartFile, musicFile, callback, skin)
     songTime = 0
     score = 0
     combo = 0
+    accuracy = 100
+    hits = 0
     misses = 0
+    totalNotes = 0
     activeHoldNote = nil
     musicStartTime = love.timer.getTime() + musicDelay
     music = love.audio.newSource(musicFile, "stream")
@@ -55,6 +60,7 @@ function loadChart(filename)
         table.insert(notes, {time = time, x = x, hold = holdTime > 0, holdTime = holdTime})
         chartEndTime = math.max(chartEndTime, time + holdTime)
     end
+    totalNotes = #notes -- Update total notes count
 end
 
 function game.update(dt)
@@ -78,6 +84,8 @@ function game.update(dt)
             table.remove(notes, i)
             misses = misses + 1
             combo = 0
+            love.audio.play(miss)
+            updateAccuracy()
         end
     end
 
@@ -119,10 +127,11 @@ function game.draw()
         love.graphics.setColor(1, 1, 1, 1) -- Reset color
     end
 
-    love.graphics.print("Press any key to hit notes, hold any key for hold notes!", 10, 10)
-    love.graphics.print("Score: " .. score, 10, 40)
-    love.graphics.print("Misses: " .. misses, 10, 70)
-    love.graphics.print("Combo: " .. combo, 500, 70)
+    love.graphics.print("Press any key to hit notes!", 10, 30)
+    love.graphics.print("Score: " .. score, 10, 60)
+    love.graphics.print("Misses: " .. misses, 10, 90)
+    love.graphics.print("Combo: " .. combo, 10, 120)
+    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 10, 150)
 
     -- Draw time bar
     drawTimeBar()
@@ -163,7 +172,9 @@ function game.keypressed(key)
         end
         score = score + 100 * #hitNotes
         combo = combo + #hitNotes
+        hits = hits + #hitNotes
         love.audio.play(hitsound)
+        updateAccuracy()
     end
 end
 
@@ -176,12 +187,22 @@ function game.keyreleased(key)
                     table.remove(notes, i)
                     score = score + 100
                     combo = combo + 1
+                    hits = hits + 1
                     love.audio.play(hitsound)
+                    updateAccuracy()
                     break
                 end
             end
         end
         activeHoldNote = nil
+    end
+end
+
+function updateAccuracy()
+    if totalNotes > 0 then
+        accuracy = (hits / (hits + misses)) * 100
+    else
+        accuracy = 100
     end
 end
 
