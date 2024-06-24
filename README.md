@@ -2,6 +2,10 @@
 
 KeyBeat is a rhythm game where you aim and press keys to the beat of the music. It's a free-to-win Roblox rhythm game and it's now open sourced. It was made in LÖVE2D
 
+## How to download
+
+Download .zip file and unpack it then open a KeyBeat.exe file and you're ready to go!
+
 ## Status
 
 This project is under constant development, but we do our best to keep things in a stable state. This project will continue to evolve until we eventually reach the point where KeyBeat is gonna be ready for release.
