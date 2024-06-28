@@ -5,15 +5,16 @@ local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
 --local chartEditor = require("chart_editor")
-
+version = "Prototype"
 
 gameState = "menu"  -- make gameState global for access in other modules
 
 function love.load()
+    songFolder2 = love.filesystem.createDirectory("songs")
     love.graphics.setFont(love.graphics.newFont(20))
-    hitsound = love.audio.newSource("assets/hitsound.ogg","static")
-    miss = love.audio.newSource("assets/miss.ogg","static")
-    cursor = love.mouse.newCursor("assets/cursor.png",0,0)
+    hitsound = love.audio.newSource("assets/hitsound.ogg", "static")
+    miss = love.audio.newSource("assets/miss.ogg", "static")
+    cursor = love.mouse.newCursor("assets/cursor.png", 0, 0)
     menu.load()
 end
 
