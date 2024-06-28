@@ -4,7 +4,7 @@ local selectedOption = 1
 local options = {}
 
 function menu.load()
-    options = {"Start Game", "Settings", "Chart Editor"}
+    options = {"Start Game", "Settings"}
 end
 
 function menu.update(dt)
