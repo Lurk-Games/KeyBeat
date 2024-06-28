@@ -14,7 +14,7 @@ function playmenu.load()
 end
 
 function loadSongs()
-    local songsFolder = "songs"
+    local songsFolder = "songs" or songFolder2
     for _, folder in ipairs(love.filesystem.getDirectoryItems(songsFolder)) do
         local chartPath = songsFolder .. "/" .. folder .. "/chart.txt"
         local musicPathMp3 = songsFolder .. "/" .. folder .. "/music.mp3"
@@ -53,6 +53,7 @@ function playmenu.update(dt)
 end
 
 function playmenu.draw()
+    love.graphics.print("Version: " .. version, 0, 650, 0, 1)
     love.graphics.printf("Choose an option:", 0, 100, love.graphics.getWidth(), "center")
 
     local startY = 150
@@ -91,10 +92,10 @@ function playmenu.keypressed(key)
             scrollOffset = scrollOffset + 1
         end
     elseif key == "return" or key == "space" then
-            local selected = options[selectedOption]
-            startGame(selected.chart, selected.music)
-    elseif key == "escape" then
-        backToMenu()
+        local selected = options[selectedOption]
+        startGame(selected.chart, selected.music)
+    --elseif key == "escape" then
+        --backToMenu()
     end
 end
 
