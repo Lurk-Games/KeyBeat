@@ -4,7 +4,6 @@ local menu = require("menu")
 local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
-local endscreen = require("endscreen")  -- Add this line
 --local chartEditor = require("chart_editor")
 version = "prototype-0.1.1"
 
@@ -30,8 +29,6 @@ function love.update(dt)
         settings.update(dt)
     elseif gameState == "playmenu" then
         playmenu.update(dt)
-    elseif gameState == "endscreen" then  -- Add this block
-        endscreen.update(dt)
     --[[elseif gameState == "chartEditor" then
         chartEditor.update(dt)]]
     end
@@ -50,12 +47,27 @@ function love.draw()
     elseif gameState == "playmenu" then
         playmenu.draw()
         love.mouse.setCursor(cursor)
-    elseif gameState == "endscreen" then  -- Add this block
-        endscreen.draw()
-        love.mouse.setCursor(cursor)
     --[[elseif gameState == "chartEditor" then
         chartEditor.draw()]]
     end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+    --[[if gameState == "chartEditor" then
+       chartEditor.mousepressed(x, y, button)
+    end]]
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+   --[[ if gameState == "chartEditor" then
+    chartEditor.mousereleased(x, y, button)
+    end]]
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+   --[[ if gameState == "chartEditor" then
+    chartEditor.mousemoved(x, y, dx, dy)
+    end]]
 end
 
 function love.keypressed(key)
@@ -67,8 +79,6 @@ function love.keypressed(key)
         settings.keypressed(key)
     elseif gameState == "playmenu" then
         playmenu.keypressed(key)
-    elseif gameState == "endscreen" then  -- Add this block
-        endscreen.keypressed(key)
     --[[elseif gameState == "chartEditor" then
         chartEditor.keypressed(key)]]
     end
@@ -88,11 +98,11 @@ function love.textinput(text)
     end]]
 end
 
-function startGame(chartFile, musicFile, songName, songCredits)
+function startGame(chartFile, musicFile)
     gameState = "game"
-    game.start(chartFile, musicFile, songName, songCredits, function()
-        gameState = "endscreen"
-        endscreen.load(songName, songCredits, score, totalNotes, hits, misses)
+    game.start(chartFile, musicFile, function()
+        gameState = "playmenu"
+        playmenu.load()
     end)
 end
 
