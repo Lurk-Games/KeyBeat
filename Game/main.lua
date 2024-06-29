@@ -88,11 +88,11 @@ function love.textinput(text)
     end]]
 end
 
-function startGame(chartFile, musicFile)
+function startGame(chartFile, musicFile, songName, songCredits)
     gameState = "game"
-    game.start(chartFile, musicFile, function()
-        gameState = "playmenu"
-        playmenu.load()
+    game.start(chartFile, musicFile, songName, songCredits, function()
+        gameState = "endscreen"
+        endscreen.load(songName, songCredits, score, totalNotes, hits, misses)
     end)
 end
 
