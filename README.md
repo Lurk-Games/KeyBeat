@@ -6,9 +6,6 @@ KeyBeat is a rhythm game where you aim and press keys to the beat of the music. 
 
 Download .zip file and unpack it then open a KeyBeat.exe file and you're ready to go!
 
-or download it from itch.io
-<iframe frameborder="0" src="https://itch.io/embed/2674372?linkback=true" width="552" height="167"><a href="https://moonwave-studios.itch.io/keybeat">KeyBeat by mnfnetwork43@gmail.com</a></iframe>
-
 ## Status
 
 This project is under constant development, but we do our best to keep things in a stable state. This project will continue to evolve until we eventually reach the point where KeyBeat is gonna be ready for release.
