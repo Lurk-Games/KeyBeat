@@ -4,18 +4,21 @@ local menu = require("menu")
 local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
+local endscreen = require("endscreen")  -- Add this line
 --local chartEditor = require("chart_editor")
-version = "Prototype"
+version = "prototype-0.1.1"
 
 gameState = "menu"  -- make gameState global for access in other modules
 
 function love.load()
     songFolder2 = love.filesystem.createDirectory("songs")
+    skinFolder = love.filesystem.createDirectory("skins")
     love.graphics.setFont(love.graphics.newFont(20))
     hitsound = love.audio.newSource("assets/hitsound.ogg", "static")
     miss = love.audio.newSource("assets/miss.ogg", "static")
     cursor = love.mouse.newCursor("assets/cursor.png", 0, 0)
     menu.load()
+    settings.load() -- Load settings, including skins
 end
 
 function love.update(dt)
@@ -27,6 +30,8 @@ function love.update(dt)
         settings.update(dt)
     elseif gameState == "playmenu" then
         playmenu.update(dt)
+    elseif gameState == "endscreen" then  -- Add this block
+        endscreen.update(dt)
     --[[elseif gameState == "chartEditor" then
         chartEditor.update(dt)]]
     end
@@ -45,27 +50,12 @@ function love.draw()
     elseif gameState == "playmenu" then
         playmenu.draw()
         love.mouse.setCursor(cursor)
+    elseif gameState == "endscreen" then  -- Add this block
+        endscreen.draw()
+        love.mouse.setCursor(cursor)
     --[[elseif gameState == "chartEditor" then
         chartEditor.draw()]]
     end
-end
-
-function love.mousepressed(x, y, button, istouch, presses)
-    --[[if gameState == "chartEditor" then
-       chartEditor.mousepressed(x, y, button)
-    end]]
-end
-
-function love.mousereleased(x, y, button, istouch, presses)
-   --[[ if gameState == "chartEditor" then
-    chartEditor.mousereleased(x, y, button)
-    end]]
-end
-
-function love.mousemoved(x, y, dx, dy, istouch)
-   --[[ if gameState == "chartEditor" then
-    chartEditor.mousemoved(x, y, dx, dy)
-    end]]
 end
 
 function love.keypressed(key)
@@ -77,6 +67,8 @@ function love.keypressed(key)
         settings.keypressed(key)
     elseif gameState == "playmenu" then
         playmenu.keypressed(key)
+    elseif gameState == "endscreen" then  -- Add this block
+        endscreen.keypressed(key)
     --[[elseif gameState == "chartEditor" then
         chartEditor.keypressed(key)]]
     end
