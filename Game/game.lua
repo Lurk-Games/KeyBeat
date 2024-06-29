@@ -1,8 +1,5 @@
--- game.lua
-
 local game = {}
 local settings = require("settings")
-local endscreen = require("endscreen")  -- Add this line
 
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
@@ -26,10 +23,8 @@ local hitEffectDuration = 0.2
 local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
-local songName = ""  -- Add this line
-local songCredits = ""  -- Add this line
 
-function game.start(chartFile, musicFile, name, credits, callback)
+function game.start(chartFile, musicFile, callback)
     songTime = 0
     score = 0
     combo = 0
@@ -47,8 +42,6 @@ function game.start(chartFile, musicFile, name, credits, callback)
     hitEffects = {}
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
-    songName = name  -- Add this line
-    songCredits = credits  -- Add this line
     
     -- Load the selected skin images
     local selectedSkin = settings.getSelectedSkin() or "default"
@@ -112,9 +105,6 @@ function game.update(dt)
         if endGameCallback then
             endGameCallback()
         end
-        -- Transition to end screen
-        gameState = "endscreen"
-        endscreen.load(songName, songCredits, score, totalNotes, hits, misses)
     end
 end
 
@@ -160,23 +150,32 @@ function drawTimeBar()
 end
 
 function game.keypressed(key)
+    local hitNotes = {}
     for i = #notes, 1, -1 do
         local note = notes[i]
-        if note.y and math.abs(note.y - hitLineY) <= hitboxSize then
+        if note.hold then
+            if note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
+                activeHoldNote = note
+                table.insert(hitNotes, i)
+                table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
+                love.audio.play(hitsound)
+            end
+        elseif note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
             table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
-            table.remove(notes, i)
-            score = score + 100
-            combo = combo + 1
-            hits = hits + 1
-            love.audio.play(hitsound)
-            updateAccuracy()
-            return
+            table.insert(hitNotes, i)
         end
     end
 
-    if key == "escape" then
-        music:stop()
-        gameState = "playmenu"
+    -- Process all hit notes at once
+    if #hitNotes > 0 then
+        for _, index in ipairs(hitNotes) do
+            table.remove(notes, index)
+        end
+        score = score + 100 * #hitNotes
+        combo = combo + #hitNotes
+        hits = hits + #hitNotes
+        love.audio.play(hitsound)
+        updateAccuracy()
     end
 end
 
