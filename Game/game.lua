@@ -1,5 +1,8 @@
+-- game.lua
+
 local game = {}
 local settings = require("settings")
+local endscreen = require("endscreen")  -- Add this line
 
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
@@ -24,7 +27,7 @@ local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
 
-function game.start(chartFile, musicFile, callback, skin)
+function game.start(chartFile, musicFile, callback)
     songTime = 0
     score = 0
     combo = 0
@@ -43,10 +46,11 @@ function game.start(chartFile, musicFile, callback, skin)
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
     
-    -- Load the skin images
-    noteImage = love.graphics.newImage("skins/default/Note.png")
-    holdNoteImage = love.graphics.newImage("skins/default/Hold.png")
-    hitEffectImage = love.graphics.newImage("skins/default/Splash.png")
+    -- Load the selected skin images
+    local selectedSkin = settings.getSelectedSkin() or "default"
+    noteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Note.png")
+    holdNoteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Hold.png")
+    hitEffectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Splash.png")
 end
 
 function loadChart(filename)
@@ -104,6 +108,9 @@ function game.update(dt)
         if endGameCallback then
             endGameCallback()
         end
+        -- Transition to end screen
+        gameState = "endscreen"
+        endscreen.load(score, totalNotes, hits, misses)
     end
 end
 
