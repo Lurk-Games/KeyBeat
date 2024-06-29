@@ -1,17 +1,24 @@
 local settings = {}
 
-local options = {"Volume", "Note Speed", "Note Size"}
+local options = {"Volume", "Note Speed", "Note Size", "Skins"}
 local selectedOption = 1
 local volume = 1
 local noteSpeed = 300
 local noteSize = 20
+local skins = {}
+local selectedSkin = 1
 
 function settings.load()
-    
+    -- Load available skins
+    local skinFiles = love.filesystem.getDirectoryItems("skins")
+    for _, skin in ipairs(skinFiles) do
+        if love.filesystem.getInfo("skins/" .. skin, "directory") then
+            table.insert(skins, skin)
+        end
+    end
 end
 
 function settings.update(dt)
-
 end
 
 function settings.draw()
@@ -25,6 +32,8 @@ function settings.draw()
             value = tostring(noteSpeed)
         elseif option == "Note Size" then
             value = tostring(noteSize)
+        elseif option == "Skins" then
+            value = skins[selectedSkin] or "No skins available"
         end
         
         if i == selectedOption then
@@ -54,6 +63,11 @@ function settings.keypressed(key)
             noteSpeed = math.max(100, noteSpeed - 50)
         elseif options[selectedOption] == "Note Size" then
             noteSize = math.max(10, noteSize - 5)
+        elseif options[selectedOption] == "Skins" then
+            selectedSkin = selectedSkin - 1
+            if selectedSkin < 1 then
+                selectedSkin = #skins
+            end
         end
     elseif key == "right" then
         if options[selectedOption] == "Volume" then
@@ -63,6 +77,11 @@ function settings.keypressed(key)
             noteSpeed = math.min(1000, noteSpeed + 50)
         elseif options[selectedOption] == "Note Size" then
             noteSize = math.min(100, noteSize + 5)
+        elseif options[selectedOption] == "Skins" then
+            selectedSkin = selectedSkin + 1
+            if selectedSkin > #skins then
+                selectedSkin = 1
+            end
         end
     elseif key == "escape" then
         backToMenu()
@@ -79,6 +98,10 @@ end
 
 function settings.getNoteSize()
     return noteSize
+end
+
+function settings.getSelectedSkin()
+    return skins[selectedSkin]
 end
 
 return settings
