@@ -66,13 +66,14 @@ function love.keyreleased(key)
     end
 end
 
-function startGame(chartFile, musicFile)
+function startGame(chartFile, musicFile, backgroundFile)
     gameState = "game"
     game.start(chartFile, musicFile, function()
         gameState = "playmenu"
         playmenu.load()
-    end)
+    end, backgroundFile)
 end
+
 
 function goToSettings()
     gameState = "settings"
@@ -85,5 +86,10 @@ end
 
 function goToPlayMenu()
     gameState = "playmenu"
+    playmenu.load()
+end
+
+function endGame(score, misses, hits, accuracy)
+    state = "playmenu"
     playmenu.load()
 end
