@@ -38,8 +38,6 @@ function menu.keypressed(key)
             goToPlayMenu()
         elseif options[selectedOption] == "Settings" then
             goToSettings()
-        --[[elseif options[selectedOption] == "Chart Editor" then
-            goToChartEditor()]]
         else
             local selected = options[selectedOption]
             startGame(selected.chart, selected.music)
