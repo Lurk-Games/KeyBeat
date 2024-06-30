@@ -21,6 +21,7 @@ function loadSongs()
         local musicPathOgg = songsFolder .. "/" .. folder .. "/music.ogg"
         local backgroundPathPng = songsFolder .. "/" .. folder .. "/background.png"
         local backgroundPathJpg = songsFolder .. "/" .. folder .. "/background.jpg"
+        local backgroundPathJpeg = songsFolder .. "/" .. folder .. "/background.jpeg"
         local musicPath = nil
         local backgroundPath = nil
         local infoPath = songsFolder .. "/" .. folder .. "/info.txt"
@@ -37,6 +38,8 @@ function loadSongs()
             backgroundPath = backgroundPathPng
         elseif love.filesystem.getInfo(backgroundPathJpg) then
             backgroundPath = backgroundPathJpg
+        elseif love.filesystem.getInfo(backgroundPathJpeg) then
+            backgroundPath = backgroundPathJpeg
         end
 
         if love.filesystem.getInfo(chartPath) and musicPath then
