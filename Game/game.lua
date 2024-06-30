@@ -122,7 +122,15 @@ function game.draw()
     local scaleX = windowWidth / backgroundWidth
     local scaleY = windowHeight / backgroundHeight
 
+    -- Draw the background image
     love.graphics.draw(background, 0, 0, 0, scaleX, scaleY)
+    
+    -- Draw the dim overlay
+    local dim = settings.getBackgroundDim()
+    love.graphics.setColor(0, 0, 0, dim)
+    love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
+    love.graphics.setColor(1, 1, 1, 1) -- Reset color
+    
     love.graphics.line(0, hitLineY, love.graphics.getWidth(), hitLineY)
 
     for _, note in ipairs(notes) do
@@ -151,6 +159,7 @@ function game.draw()
     -- Draw time bar
     drawTimeBar()
 end
+
 
 
 function drawTimeBar()
