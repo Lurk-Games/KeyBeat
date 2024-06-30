@@ -14,6 +14,7 @@ local hits = 0
 local totalNotes = 0
 local accuracy = 100
 local music
+local background
 local musicDelay = 1
 local musicStartTime = nil
 local chartEndTime = 0
@@ -24,7 +25,7 @@ local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
 
-function game.start(chartFile, musicFile, callback)
+function game.start(chartFile, musicFile, callback, backgroundFile)
     songTime = 0
     score = 0
     combo = 0
@@ -40,6 +41,11 @@ function game.start(chartFile, musicFile, callback)
     loadChart(chartFile)
     endGameCallback = callback
     hitEffects = {}
+    if backgroundFile then
+        background = love.graphics.newImage(backgroundFile)
+    else
+        background = nil
+    end
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
     
@@ -49,6 +55,7 @@ function game.start(chartFile, musicFile, callback)
     holdNoteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Hold.png")
     hitEffectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Splash.png")
 end
+
 
 function loadChart(filename)
     notes = {}
@@ -109,6 +116,13 @@ function game.update(dt)
 end
 
 function game.draw()
+    local windowWidth, windowHeight = love.graphics.getDimensions()
+    local backgroundWidth = background:getWidth()
+    local backgroundHeight = background:getHeight()
+    local scaleX = windowWidth / backgroundWidth
+    local scaleY = windowHeight / backgroundHeight
+
+    love.graphics.draw(background, 0, 0, 0, scaleX, scaleY)
     love.graphics.line(0, hitLineY, love.graphics.getWidth(), hitLineY)
 
     for _, note in ipairs(notes) do
@@ -137,6 +151,7 @@ function game.draw()
     -- Draw time bar
     drawTimeBar()
 end
+
 
 function drawTimeBar()
     local screenWidth = love.graphics.getWidth()
