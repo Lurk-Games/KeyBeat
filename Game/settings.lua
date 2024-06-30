@@ -1,12 +1,13 @@
 local settings = {}
 
-local options = {"Volume", "Note Speed", "Note Size", "Skins"}
+local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim"}
 local selectedOption = 1
 local volume = 1
 local noteSpeed = 300
 local noteSize = 20
 local skins = {}
 local selectedSkin = 1
+local backgroundDim = 0.5 -- Default dim value
 
 function settings.load()
     -- Load available skins
@@ -34,6 +35,8 @@ function settings.draw()
             value = tostring(noteSize)
         elseif option == "Skins" then
             value = skins[selectedSkin] or "No skins available"
+        elseif option == "Background Dim" then
+            value = tostring(math.floor(backgroundDim * 100)) .. "%"
         end
         
         if i == selectedOption then
@@ -68,6 +71,8 @@ function settings.keypressed(key)
             if selectedSkin < 1 then
                 selectedSkin = #skins
             end
+        elseif options[selectedOption] == "Background Dim" then
+            backgroundDim = math.max(0, backgroundDim - 0.1)
         end
     elseif key == "right" then
         if options[selectedOption] == "Volume" then
@@ -82,6 +87,8 @@ function settings.keypressed(key)
             if selectedSkin > #skins then
                 selectedSkin = 1
             end
+        elseif options[selectedOption] == "Background Dim" then
+            backgroundDim = math.min(1, backgroundDim + 0.1)
         end
     elseif key == "escape" then
         backToMenu()
@@ -102,6 +109,10 @@ end
 
 function settings.getSelectedSkin()
     return skins[selectedSkin]
+end
+
+function settings.getBackgroundDim()
+    return backgroundDim
 end
 
 return settings
