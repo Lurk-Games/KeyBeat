@@ -14,12 +14,15 @@ function playmenu.load()
 end
 
 function loadSongs()
-    local songsFolder = "songs" or songFolder2
+    local songsFolder = "songs"
     for _, folder in ipairs(love.filesystem.getDirectoryItems(songsFolder)) do
         local chartPath = songsFolder .. "/" .. folder .. "/chart.txt"
         local musicPathMp3 = songsFolder .. "/" .. folder .. "/music.mp3"
         local musicPathOgg = songsFolder .. "/" .. folder .. "/music.ogg"
+        local backgroundPathPng = songsFolder .. "/" .. folder .. "/background.png"
+        local backgroundPathJpg = songsFolder .. "/" .. folder .. "/background.jpg"
         local musicPath = nil
+        local backgroundPath = nil
         local infoPath = songsFolder .. "/" .. folder .. "/info.txt"
 
         -- Check if either .mp3 or .ogg file exists
@@ -27,6 +30,13 @@ function loadSongs()
             musicPath = musicPathMp3
         elseif love.filesystem.getInfo(musicPathOgg) then
             musicPath = musicPathOgg
+        end
+
+        -- Check if either .png or .jpg file exists
+        if love.filesystem.getInfo(backgroundPathPng) then
+            backgroundPath = backgroundPathPng
+        elseif love.filesystem.getInfo(backgroundPathJpg) then
+            backgroundPath = backgroundPathJpg
         end
 
         if love.filesystem.getInfo(chartPath) and musicPath then
@@ -44,10 +54,11 @@ function loadSongs()
                     end
                 end
             end
-            table.insert(options, {chart = chartPath, music = musicPath, name = folder, credits = credits, difficulty = difficulty})
+            table.insert(options, {chart = chartPath, music = musicPath, name = folder, credits = credits, difficulty = difficulty, background = backgroundPath})
         end
     end
 end
+
 
 function playmenu.update(dt)
 end
@@ -93,10 +104,9 @@ function playmenu.keypressed(key)
         end
     elseif key == "return" or key == "space" then
         local selected = options[selectedOption]
-        startGame(selected.chart, selected.music)
-    --elseif key == "escape" then
-        --backToMenu()
+        startGame(selected.chart, selected.music, selected.background)
     end
 end
+
 
 return playmenu
