@@ -25,6 +25,19 @@ local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
 
+local function displayScoreBreakdown()
+    local breakdown = {
+        score = score,
+        hits = hits,
+        misses = misses,
+        accuracy = accuracy,
+        totalNotes = totalNotes,
+    }
+    if endGameCallback then
+        endGameCallback(breakdown)
+    end
+end
+
 function game.start(chartFile, musicFile, callback, backgroundFile)
     songTime = 0
     score = 0
@@ -55,6 +68,7 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     holdNoteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Hold.png")
     hitEffectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Splash.png")
 end
+
 
 
 function loadChart(filename)
@@ -109,11 +123,10 @@ function game.update(dt)
     -- Check if all notes are gone and the song has ended
     if #notes == 0 and songTime > chartEndTime then
         music:stop()
-        if endGameCallback then
-            endGameCallback()
-        end
+        displayScoreBreakdown()
     end
 end
+
 
 function game.draw()
     local windowWidth, windowHeight = love.graphics.getDimensions()
@@ -230,5 +243,6 @@ function updateAccuracy()
         accuracy = 100
     end
 end
+
 
 return game
