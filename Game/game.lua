@@ -24,6 +24,9 @@ local hitEffectDuration = 0.2
 local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
+local missImage -- Variable to hold the miss image
+local missTextEffects = {}
+local missTextDuration = 0.5
 
 local function displayScoreBreakdown()
     local breakdown = {
@@ -67,9 +70,8 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     noteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Note.png")
     holdNoteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Hold.png")
     hitEffectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Splash.png")
+    missImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Miss.png") -- Load miss image
 end
-
-
 
 function loadChart(filename)
     notes = {}
@@ -103,6 +105,7 @@ function game.update(dt)
         note.y = hitLineY - (note.time - songTime) * noteSpeed
 
         if note.y > hitLineY + noteSize + (note.hold and note.holdTime * noteSpeed or 0) then
+            table.insert(missTextEffects, {x = note.x, time = missTextDuration}) -- Add miss image effect
             table.remove(notes, i)
             misses = misses + 1
             combo = 0
@@ -120,13 +123,21 @@ function game.update(dt)
         end
     end
 
+    -- Update miss image effects
+    for i = #missTextEffects, 1, -1 do
+        local effect = missTextEffects[i]
+        effect.time = effect.time - dt
+        if effect.time <= 0 then
+            table.remove(missTextEffects, i)
+        end
+    end
+
     -- Check if all notes are gone and the song has ended
     if #notes == 0 and songTime > chartEndTime then
         music:stop()
         displayScoreBreakdown()
     end
 end
-
 
 function game.draw()
     local windowWidth, windowHeight = love.graphics.getDimensions()
@@ -163,6 +174,13 @@ function game.draw()
         love.graphics.setColor(1, 1, 1, 1) -- Reset color
     end
 
+    -- Draw miss image effects
+    for _, effect in ipairs(missTextEffects) do
+        love.graphics.setColor(1, 1, 1, effect.time / missTextDuration) -- Fade out effect
+        love.graphics.draw(missImage, effect.x - noteSize / 2, hitLineY - noteSize / 2, 0, noteSize / missImage:getWidth(), noteSize / missImage:getHeight())
+        love.graphics.setColor(1, 1, 1, 1) -- Reset color
+    end
+
     love.graphics.print("Press any key to hit notes!", 10, 30)
     love.graphics.print("Score: " .. score, 10, 60)
     love.graphics.print("Misses: " .. misses, 10, 90)
@@ -172,8 +190,6 @@ function game.draw()
     -- Draw time bar
     drawTimeBar()
 end
-
-
 
 function drawTimeBar()
     local screenWidth = love.graphics.getWidth()
