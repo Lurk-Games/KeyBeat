@@ -25,6 +25,8 @@ local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
 local missImage -- Variable to hold the miss image
+local missImageSize = 150  -- Size of the miss image
+local missTextDuration = 1  -- Duration in seconds for the miss image to fade out
 local missTextEffects = {}
 local missTextDuration = 0.5
 
@@ -105,7 +107,7 @@ function game.update(dt)
         note.y = hitLineY - (note.time - songTime) * noteSpeed
 
         if note.y > hitLineY + noteSize + (note.hold and note.holdTime * noteSpeed or 0) then
-            table.insert(missTextEffects, {x = note.x, time = missTextDuration}) -- Add miss image effect
+            table.insert(missTextEffects, {time = missTextDuration})  -- Add miss effect
             table.remove(notes, i)
             misses = misses + 1
             combo = 0
@@ -123,7 +125,7 @@ function game.update(dt)
         end
     end
 
-    -- Update miss image effects
+    -- Update miss text effects
     for i = #missTextEffects, 1, -1 do
         local effect = missTextEffects[i]
         effect.time = effect.time - dt
@@ -174,11 +176,13 @@ function game.draw()
         love.graphics.setColor(1, 1, 1, 1) -- Reset color
     end
 
-    -- Draw miss image effects
+    -- Draw miss effects
     for _, effect in ipairs(missTextEffects) do
-        love.graphics.setColor(1, 1, 1, effect.time / missTextDuration) -- Fade out effect
-        love.graphics.draw(missImage, effect.x - noteSize / 2, hitLineY - noteSize / 2, 0, noteSize / missImage:getWidth(), noteSize / missImage:getHeight())
-        love.graphics.setColor(1, 1, 1, 1) -- Reset color
+        love.graphics.setColor(1, 1, 1, effect.time / missTextDuration)  -- Fade out effect
+        local x = love.graphics.getWidth() / 2 - missImageSize / 2
+        local y = love.graphics.getHeight() / 2 - missImageSize / 2
+        love.graphics.draw(missImage, x, y, 0, missImageSize / missImage:getWidth(), missImageSize / missImage:getHeight())
+        love.graphics.setColor(1, 1, 1, 1)  -- Reset color
     end
 
     love.graphics.print("Press any key to hit notes!", 10, 30)
