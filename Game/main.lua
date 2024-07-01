@@ -5,7 +5,7 @@ local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
 
-version = "prototype-0.1.1"
+version = "prototype-0.1.2"
 
 gameState = "menu"  -- make gameState global for access in other modules
 
@@ -68,11 +68,12 @@ end
 
 function startGame(chartFile, musicFile, backgroundFile)
     gameState = "game"
-    game.start(chartFile, musicFile, function()
+    game.start(chartFile, musicFile, function(breakdown)
         gameState = "playmenu"
-        playmenu.load()
+        playmenu.load(breakdown)
     end, backgroundFile)
 end
+
 
 
 function goToSettings()
