@@ -5,7 +5,7 @@ local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
 
-version = "prototype-0.1.2"
+version = "prototype-0.1.3"
 
 gameState = "menu"  -- make gameState global for access in other modules
 
@@ -18,6 +18,7 @@ function love.load()
     cursor = love.mouse.newCursor("assets/cursor.png", 0, 0)
     menu.load()
     settings.load() -- Load settings, including skins
+    love.window.setFullscreen(settings.getFullscreen()) -- Set initial fullscreen state
 end
 
 function love.update(dt)
@@ -74,7 +75,10 @@ function startGame(chartFile, musicFile, backgroundFile)
     end, backgroundFile)
 end
 
-
+function goToPlayMenu()
+    gameState = "playmenu"
+    playmenu.load()
+end
 
 function goToSettings()
     gameState = "settings"
@@ -82,15 +86,5 @@ end
 
 function backToMenu()
     gameState = "menu"
-    menu.load()
-end
-
-function goToPlayMenu()
-    gameState = "playmenu"
-    playmenu.load()
-end
-
-function endGame(score, misses, hits, accuracy)
-    state = "playmenu"
-    playmenu.load()
+    menu.load()  -- Reload the menu options
 end
