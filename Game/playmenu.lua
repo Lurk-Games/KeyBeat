@@ -15,7 +15,6 @@ function playmenu.load(breakdown)
     scoreBreakdown = breakdown
 end
 
-
 function loadSongs()
     local songsFolder = "songs"
     for _, folder in ipairs(love.filesystem.getDirectoryItems(songsFolder)) do
@@ -65,7 +64,6 @@ function loadSongs()
     end
 end
 
-
 function playmenu.update(dt)
 end
 
@@ -79,7 +77,7 @@ function playmenu.draw()
         love.graphics.printf("Misses: " .. scoreBreakdown.misses, 0, 250, love.graphics.getWidth(), "center")
         love.graphics.printf("Accuracy: " .. string.format("%.2f", scoreBreakdown.accuracy) .. "%", 0, 300, love.graphics.getWidth(), "center")
         love.graphics.printf("Total Notes: " .. scoreBreakdown.totalNotes, 0, 350, love.graphics.getWidth(), "center")
-        love.graphics.printf("Press any key to continue...", 0, 400, love.graphics.getWidth(), "center")
+        love.graphics.printf("Press SPACE to continue...", 0, 400, love.graphics.getWidth(), "center")
     else
         love.graphics.printf("Choose an option:", 0, 100, love.graphics.getWidth(), "center")
 
@@ -87,11 +85,15 @@ function playmenu.draw()
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
             local option = options[i]
             local bgY = startY + (i - scrollOffset - 1) * 100
+
+            -- Highlight selected option
             if i == selectedOption then
                 love.graphics.setColor(0.7, 0.7, 0.7, 1)
             else
                 love.graphics.setColor(1, 1, 1, 1)
             end
+
+            -- Draw option text
             love.graphics.rectangle("fill", love.graphics.getWidth() / 4, bgY, love.graphics.getWidth() / 2, 80)
             
             love.graphics.setColor(0, 0, 0, 1)
@@ -102,10 +104,11 @@ function playmenu.draw()
     end
 end
 
-
 function playmenu.keypressed(key)
     if scoreBreakdown then
-        scoreBreakdown = nil
+        if key == "space" then
+            scoreBreakdown = nil
+        end
     else
         if key == "up" then
             selectedOption = selectedOption - 1
@@ -126,10 +129,10 @@ function playmenu.keypressed(key)
         elseif key == "return" or key == "space" then
             local selected = options[selectedOption]
             startGame(selected.chart, selected.music, selected.background)
+        elseif key == "escape" then
+            backToMenu()  -- Go back to the main menu
         end
     end
 end
-
-
 
 return playmenu
