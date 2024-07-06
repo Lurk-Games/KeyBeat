@@ -5,8 +5,6 @@ local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
 
-version = "prototype-0.1.3"
-
 gameState = "menu"  -- make gameState global for access in other modules
 
 function love.load()
@@ -39,13 +37,10 @@ function love.draw()
         love.mouse.setCursor(cursor)
     elseif gameState == "game" then
         game.draw()
-        love.mouse.setCursor(cursor)
     elseif gameState == "settings" then
         settings.draw()
-        love.mouse.setCursor(cursor)
     elseif gameState == "playmenu" then
         playmenu.draw()
-        love.mouse.setCursor(cursor)
     end
 end
 
@@ -86,5 +81,5 @@ end
 
 function backToMenu()
     gameState = "menu"
-    menu.load()  -- Reload the menu options
+    menu.load()  -- Reload the menu options, but not the background
 end
