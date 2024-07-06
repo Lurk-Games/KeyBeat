@@ -1,12 +1,12 @@
 -- settings.lua
 local settings = {}
 
-local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim", "Miss Effect Size", "Fullscreen"}
+local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim", "Rating Effect Size", "Fullscreen"}
 local selectedOption = 1
 local volume = 1
 local noteSpeed = 300
 local noteSize = 20
-local missImageSize = 150
+local RatingEffectImageSize = 150
 local skins = {}
 local selectedSkin = 1
 local backgroundDim = 0.5 -- Default dim value
@@ -21,7 +21,7 @@ local function saveSettings()
         noteSize = noteSize,
         selectedSkin = selectedSkin,
         backgroundDim = backgroundDim,
-        missImageSize = missImageSize,
+        RatingEffectImageSize = RatingEffectImageSize, -- Corrected field name
         isFullscreen = isFullscreen
     }
     
@@ -30,7 +30,6 @@ local function saveSettings()
     local compressedData = love.data.compress("string", "lz4", byteData) -- Compress the base64 encoded byte data using LZ4
     love.filesystem.write("settings.txt", compressedData)
 end
-
 
 local function loadSettings()
     if love.filesystem.getInfo("settings.txt") then
@@ -48,7 +47,7 @@ local function loadSettings()
                     noteSize = data.noteSize or noteSize
                     selectedSkin = data.selectedSkin or selectedSkin
                     backgroundDim = data.backgroundDim or backgroundDim
-                    missImageSize = data.missImageSize or missImageSize
+                    RatingEffectImageSize = data.RatingEffectImageSize or RatingEffectImageSize -- Corrected field name
                     isFullscreen = data.isFullscreen or isFullscreen
                 else
                     print("Failed to decode JSON data from decompressed LZ4 data.")
@@ -94,8 +93,8 @@ function settings.draw()
             value = skins[selectedSkin] or "No skins available"
         elseif option == "Background Dim" then
             value = tostring(math.floor(backgroundDim * 100)) .. "%"
-        elseif option == "Miss Effect Size" then
-            value = tostring(missImageSize)
+        elseif option == "Rating Effect Size" then
+            value = tostring(RatingEffectImageSize)
         elseif option == "Fullscreen" then
             value = isFullscreen and "On" or "Off"
         end
@@ -136,8 +135,8 @@ function settings.keypressed(key)
             end
         elseif options[selectedOption] == "Background Dim" then
             backgroundDim = math.max(0, math.min(1, backgroundDim + (key == "left" and -0.1 or 0.1)))
-        elseif options[selectedOption] == "Miss Effect Size" then
-            missImageSize = math.max(100, missImageSize + (key == "left" and -50 or 50))
+        elseif options[selectedOption] == "Rating Effect Size" then
+            RatingEffectImageSize = math.max(20, RatingEffectImageSize + (key == "left" and -10 or 10))
         elseif options[selectedOption] == "Fullscreen" then
             isFullscreen = not isFullscreen
             love.window.setFullscreen(isFullscreen)
@@ -168,8 +167,8 @@ function settings.getBackgroundDim()
     return backgroundDim
 end
 
-function settings.getMissSize()
-    return missImageSize
+function settings.getRatingSize()
+    return RatingEffectImageSize
 end
 
 function settings.getFullscreen()
