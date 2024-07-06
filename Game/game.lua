@@ -25,10 +25,23 @@ local noteImage -- Variable to hold the note image
 local holdNoteImage -- Variable to hold the hold note image
 local hitEffectImage -- Variable to hold the hit effect image
 local missImage -- Variable to hold the miss image
-local missImageSize = 150  -- Size of the miss image
+local RatingEffectImageSize = settings.getRatingSize()  -- Size of the miss image
 local missTextDuration = 1  -- Duration in seconds for the miss image to fade out
 local missTextEffects = {}
-local missTextDuration = 0.5
+local ratingTextDuration = 0.5 -- Duration for rating text to fade out
+local ratingTextEffects = {}
+
+local perfectImage
+local goodImage
+local okayImage
+local badImage
+
+local timingWindows = {
+    perfect = 0.05,
+    good = 0.1,
+    okay = 0.2,
+    bad = 0.3
+}
 
 local function displayScoreBreakdown()
     local breakdown = {
@@ -59,6 +72,7 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     loadChart(chartFile)
     endGameCallback = callback
     hitEffects = {}
+    ratingTextEffects = {}
     if backgroundFile then
         background = love.graphics.newImage(backgroundFile)
     else
@@ -73,6 +87,12 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     holdNoteImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Hold.png")
     hitEffectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Splash.png")
     missImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Miss.png") -- Load miss image
+
+    -- Load rating images
+    perfectImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Perfect.png")
+    goodImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Good.png")
+    okayImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Okay.png")
+    badImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Bad.png")
 end
 
 function loadChart(filename)
@@ -134,6 +154,15 @@ function game.update(dt)
         end
     end
 
+    -- Update rating text effects
+    for i = #ratingTextEffects, 1, -1 do
+        local effect = ratingTextEffects[i]
+        effect.time = effect.time - dt
+        if effect.time <= 0 then
+            table.remove(ratingTextEffects, i)
+        end
+    end
+
     -- Check if all notes are gone and the song has ended
     if #notes == 0 and songTime > chartEndTime then
         music:stop()
@@ -179,9 +208,18 @@ function game.draw()
     -- Draw miss effects
     for _, effect in ipairs(missTextEffects) do
         love.graphics.setColor(1, 1, 1, effect.time / missTextDuration)  -- Fade out effect
-        local x = love.graphics.getWidth() / 2 - missImageSize / 2
-        local y = love.graphics.getHeight() / 2 - missImageSize / 2
-        love.graphics.draw(missImage, x, y, 0, missImageSize / missImage:getWidth(), missImageSize / missImage:getHeight())
+        local x = love.graphics.getWidth() / 2 - RatingEffectImageSize / 2
+        local y = love.graphics.getHeight() / 2 - RatingEffectImageSize / 2
+        love.graphics.draw(missImage, x, y, 0, RatingEffectImageSize / missImage:getWidth(), RatingEffectImageSize / missImage:getHeight())
+        love.graphics.setColor(1, 1, 1, 1)  -- Reset color
+    end
+
+    -- Draw rating text effects
+    for _, effect in ipairs(ratingTextEffects) do
+        love.graphics.setColor(1, 1, 1, effect.time / ratingTextDuration) -- Fade out effect
+        local x = love.graphics.getWidth() / 2 - RatingEffectImageSize / 2
+        local y = love.graphics.getHeight() / 2 - RatingEffectImageSize / 2
+        love.graphics.draw(effect.image, x, y, 0, RatingEffectImageSize / effect.image:getWidth(), RatingEffectImageSize / effect.image:getHeight())
         love.graphics.setColor(1, 1, 1, 1)  -- Reset color
     end
 
@@ -216,10 +254,12 @@ function game.keypressed(key)
                 table.insert(hitNotes, i)
                 table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
                 love.audio.play(hitsound)
+                addRatingEffect(note.time - songTime) -- Add rating effect
             end
         elseif note.y and note.y >= hitLineY - hitboxSize and note.y <= hitLineY + hitboxSize then
             table.insert(hitEffects, {x = note.x, time = hitEffectDuration})
             table.insert(hitNotes, i)
+            addRatingEffect(note.time - songTime) -- Add rating effect
         end
     end
 
@@ -256,6 +296,26 @@ function game.keyreleased(key)
     end
 end
 
+function addRatingEffect(timingDifference)
+    local ratingImage
+    local ratingValue
+    if math.abs(timingDifference) < timingWindows.perfect then
+        ratingImage = perfectImage
+        ratingValue = 1
+    elseif math.abs(timingDifference) < timingWindows.good then
+        ratingImage = goodImage
+        ratingValue = 0.75
+    elseif math.abs(timingDifference) < timingWindows.okay then
+        ratingImage = okayImage
+        ratingValue = 0.5
+    else
+        ratingImage = badImage
+        ratingValue = 0.25
+    end
+    table.insert(ratingTextEffects, {image = ratingImage, time = ratingTextDuration})
+    accuracy = (accuracy * (hits + misses - 1) + ratingValue * 100) / (hits + misses) -- Update accuracy
+end
+
 function updateAccuracy()
     if totalNotes > 0 then
         accuracy = (hits / (hits + misses)) * 100
@@ -263,6 +323,5 @@ function updateAccuracy()
         accuracy = 100
     end
 end
-
 
 return game
