@@ -80,6 +80,7 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     end
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
+    RatingEffectImageSize = settings.getRatingSize()
     
     -- Load the selected skin images
     local selectedSkin = settings.getSelectedSkin() or "default"
