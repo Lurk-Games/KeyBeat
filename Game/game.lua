@@ -225,10 +225,10 @@ function game.draw()
     end
 
     love.graphics.print("Press any key to hit notes!", 10, 30)
-    love.graphics.print("Score: " .. score, 10, 60)
-    love.graphics.print("Misses: " .. misses, 10, 90)
-    love.graphics.print("Combo: " .. combo, 10, 120)
-    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 10, 150)
+    love.graphics.print("Score: " .. score, 300, 700)
+    love.graphics.print("Misses: " .. misses, 500, 700)
+    love.graphics.print("Combo: " .. combo, 700, 700)
+    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 900, 700)
 
     -- Draw time bar
     drawTimeBar()
