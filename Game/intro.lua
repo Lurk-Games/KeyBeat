@@ -10,7 +10,6 @@ function intro.load()
     introElapsed = 0
     introFinished = false
 
-    -- Load your font (assuming "Moderniz.otf" is the font file in "Fonts" directory)
     introFont = love.graphics.newFont("Fonts/Moderniz.otf", 24)  -- Adjust size as needed
 end
 
