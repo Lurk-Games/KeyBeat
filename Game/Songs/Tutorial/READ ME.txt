@@ -1,1 +1,1 @@
-You will need to upload "music.ogg" here to make the chart work
+You will need to upload a music file named "music" here and a background file named "background" to make the chart work
