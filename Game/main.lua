@@ -7,8 +7,6 @@ local playmenu = require("playmenu")
 local intro = require("intro")
 local credits = require("credits")
 
-version = "prototype-0.1.4"
-
 gameState = "intro"  -- make gameState global for access in other modules
 
 function love.load()
