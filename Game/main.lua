@@ -4,19 +4,39 @@ local menu = require("menu")
 local game = require("game")
 local settings = require("settings")
 local playmenu = require("playmenu")
+local intro = require("intro")
+local credits = require("credits")
 
-gameState = "menu"  -- make gameState global for access in other modules
+version = "prototype-0.1.4"
+
+gameState = "intro"  -- make gameState global for access in other modules
 
 function love.load()
-    songFolder2 = love.filesystem.createDirectory("songs")
-    skinFolder = love.filesystem.createDirectory("skins")
     love.graphics.setFont(love.graphics.newFont(20))
     hitsound = love.audio.newSource("assets/hitsound.ogg", "static")
     miss = love.audio.newSource("assets/miss.ogg", "static")
     cursor = love.mouse.newCursor("assets/cursor.png", 0, 0)
-    menu.load()
+    logo = love.graphics.newImage("assets/logo.png")
+    intro.load()
     settings.load() -- Load settings, including skins
     love.window.setFullscreen(settings.getFullscreen()) -- Set initial fullscreen state
+
+    -- Register mouse events for playmenu
+    love.mouse.setVisible(true)
+    love.mouse.setGrabbed(false)
+    love.mouse.setRelativeMode(false)
+    love.mousemoved = playmenu.mousemoved  -- Register mousemoved function
+
+    logoSizeX = 250
+    logoSizeY = 250
+
+    -- Original dimensions of the image
+    originalWidth = logo:getWidth()
+    originalHeight = logo:getHeight()
+
+    -- Calculate the scaling factors
+    LogoscaleX = logoSizeX / originalWidth
+    LogoscaleY = logoSizeY / originalHeight
 end
 
 function love.update(dt)
@@ -28,6 +48,10 @@ function love.update(dt)
         settings.update(dt)
     elseif gameState == "playmenu" then
         playmenu.update(dt)
+    elseif gameState == "intro" then
+        intro.update(dt)
+    elseif gameState == "credits" then
+        credits.update(dt)
     end
 end
 
@@ -41,6 +65,10 @@ function love.draw()
         settings.draw()
     elseif gameState == "playmenu" then
         playmenu.draw()
+    elseif gameState == "intro" then
+        intro.draw()
+    elseif gameState == "credits" then
+        credits.draw()
     end
 end
 
@@ -53,12 +81,30 @@ function love.keypressed(key)
         settings.keypressed(key)
     elseif gameState == "playmenu" then
         playmenu.keypressed(key)
+    elseif gameState == "intro" then
+        intro.keypressed(key)
+    elseif gameState == "credits" then
+        credits.keypressed(key)
     end
 end
 
 function love.keyreleased(key)
     if gameState == "game" then
         game.keyreleased(key)
+    end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+    if gameState == "playmenu" then
+        playmenu.mousepressed(x, y, button)
+    elseif gameState == "menu" then
+        menu.mousepressed(x,y,button)
+    end
+end
+
+function love.wheelmoved(x, y)
+    if gameState == "playmenu" then
+        playmenu.wheelmoved(x, y)
     end
 end
 
@@ -82,4 +128,9 @@ end
 function backToMenu()
     gameState = "menu"
     menu.load()  -- Reload the menu options, but not the background
+end
+
+function goToCredits()
+    gameState = "credits"
+    credits.load()
 end
