@@ -30,11 +30,14 @@ local missTextDuration = 1  -- Duration in seconds for the miss image to fade ou
 local missTextEffects = {}
 local ratingTextDuration = 0.5 -- Duration for rating text to fade out
 local ratingTextEffects = {}
+local isPaused = false
 
 local perfectImage
 local goodImage
 local okayImage
 local badImage
+
+local currentGrade = ""
 
 local timingWindows = {
     perfect = 0.05,
@@ -43,6 +46,33 @@ local timingWindows = {
     bad = 0.3
 }
 
+local grades = {
+    { grade = "SS", minAccuracy = 100 },
+    { grade = "S", minAccuracy = 90, maxAccuracy = 99.99 },
+    { grade = "A", minAccuracy = 80, maxAccuracy = 89.99 },
+    { grade = "B", minAccuracy = 70, maxAccuracy = 79.99 },
+    { grade = "C", minAccuracy = 60, maxAccuracy = 69.99 },
+    { grade = "D", maxAccuracy = 59.99 }
+}
+
+-- Helper function to calculate grade based on accuracy
+local function calculateGrade(accuracy)
+    if accuracy >= 100 then
+        return "SS"
+    elseif accuracy >= 90 then
+        return "S"
+    elseif accuracy >= 80 then
+        return "A"
+    elseif accuracy >= 70 then
+        return "B"
+    elseif accuracy >= 60 then
+        return "C"
+    else
+        return "D"
+    end
+end
+
+-- Now define displayScoreBreakdown function
 local function displayScoreBreakdown()
     local breakdown = {
         score = score,
@@ -50,6 +80,7 @@ local function displayScoreBreakdown()
         misses = misses,
         accuracy = accuracy,
         totalNotes = totalNotes,
+        grade = calculateGrade(accuracy),  -- Now Lua knows about calculateGrade
     }
     if endGameCallback then
         endGameCallback(breakdown)
@@ -111,6 +142,10 @@ function loadChart(filename)
 end
 
 function game.update(dt)
+    if isPaused then
+        return
+    end
+
     local currentTime = love.timer.getTime()
 
     if currentTime >= musicStartTime and not music:isPlaying() then
@@ -171,6 +206,7 @@ function game.update(dt)
     end
 end
 
+
 function game.draw()
     local windowWidth, windowHeight = love.graphics.getDimensions()
     local backgroundWidth = background:getWidth()
@@ -225,13 +261,26 @@ function game.draw()
     end
 
     love.graphics.print("Press any key to hit notes!", 10, 30)
-    love.graphics.print("Score: " .. score, 300, 700)
-    love.graphics.print("Misses: " .. misses, 500, 700)
-    love.graphics.print("Combo: " .. combo, 700, 700)
-    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 900, 700)
+    love.graphics.print("Score: " .. score, 300, love.graphics.getHeight() - 50)
+    love.graphics.print("Misses: " .. misses, 500, love.graphics.getHeight() - 50)
+    love.graphics.print("Combo: " .. combo, 700, love.graphics.getHeight() - 50)
+    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 900, love.graphics.getHeight() - 50)
 
     -- Draw time bar
     drawTimeBar()
+
+    -- Draw pause screen if paused
+    if isPaused then
+        drawPause()
+    end
+end
+
+function drawPause()
+    local windowWidth, windowHeight = love.graphics.getDimensions()
+    love.graphics.setColor(0, 0, 0, 0.5)
+    love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf("Paused", 0, windowHeight / 2, windowWidth, "center")
 end
 
 function drawTimeBar()
@@ -247,6 +296,15 @@ end
 
 function game.keypressed(key)
     local hitNotes = {}
+
+    if key == "escape" then
+        if isPaused then
+            resumeGame()
+        else
+            pauseGame()
+        end
+    end
+
     for i = #notes, 1, -1 do
         local note = notes[i]
         if note.hold then
@@ -300,21 +358,37 @@ end
 function addRatingEffect(timingDifference)
     local ratingImage
     local ratingValue
+    local grade
+
     if math.abs(timingDifference) < timingWindows.perfect then
         ratingImage = perfectImage
         ratingValue = 1
+        grade = "SS"
     elseif math.abs(timingDifference) < timingWindows.good then
         ratingImage = goodImage
         ratingValue = 0.75
+        grade = "S"
     elseif math.abs(timingDifference) < timingWindows.okay then
         ratingImage = okayImage
         ratingValue = 0.5
+        grade = "A"
     else
         ratingImage = badImage
         ratingValue = 0.25
+        grade = "B"
     end
-    table.insert(ratingTextEffects, {image = ratingImage, time = ratingTextDuration})
-    accuracy = (accuracy * (hits + misses - 1) + ratingValue * 100) / (hits + misses) -- Update accuracy
+
+    -- Assign grade image
+    local gradeImage = love.graphics.newImage("skins/default/" .. grade .. ".png")
+
+    -- Clear existing rating effects
+    ratingTextEffects = {}
+
+    -- Add the new rating effect
+    table.insert(ratingTextEffects, {image = ratingImage, gradeImage = gradeImage, time = ratingTextDuration})
+
+    -- Update accuracy
+    accuracy = (accuracy * (hits + misses - 1) + ratingValue * 100) / (hits + misses)
 end
 
 function updateAccuracy()
@@ -323,6 +397,26 @@ function updateAccuracy()
     else
         accuracy = 100
     end
+
+    -- Determine current grade
+    currentGrade = ""
+    for _, gradeData in ipairs(grades) do
+        if (not gradeData.minAccuracy or accuracy >= gradeData.minAccuracy) and
+           (not gradeData.maxAccuracy or accuracy <= gradeData.maxAccuracy) then
+            currentGrade = gradeData.grade
+            break
+        end
+    end
+end
+
+function pauseGame()
+    isPaused = true
+    music:pause()
+end
+
+function resumeGame()
+    isPaused = false
+    music:play()
 end
 
 return game
