@@ -11,7 +11,7 @@ Download .zip file and unpack it then open a KeyBeat.exe file and you're ready t
 This project is under constant development, but we do our best to keep things in a stable state. This project will continue to evolve until we eventually reach the point where KeyBeat is gonna be ready for release.
 
 ## To-Do list
-You can access the to-do list [here](https://github.com/orgs/Lurk-Games/projects/5/views/1).
+You can access the to-do list [here](https://github.com/users/Virus01Official/projects/17/views/1).
 
 
 ## Support
