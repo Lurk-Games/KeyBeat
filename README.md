@@ -22,7 +22,7 @@ You can support our further development through our Ko-Fi page
 ### Contact
 You can contact us through any of those ways:
 
-Twitter: https://x.com/KeyBeat_Dev
+Twitter: https://x.com/KeyBeatGame
 
 Discord: https://discord.gg/SnAnC4x7VT
 
