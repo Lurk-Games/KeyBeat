@@ -17,10 +17,13 @@ local showButtons = false
 local animationInProgress = false
 local randomTips = {
     "Report any bugs",
-    "What is life",
+    "What is life?",
     "Opera GX is cool",
     "Also try out osu!",
     "Also try out rhythia",
+    "'Click the circles'",
+    "osu! is a game about circles",
+    "O CHOLERA, CZY TO FREDDY FAZBEAR?!",
 }
 
 -- Function to load songs
@@ -129,7 +132,6 @@ local x = (love.graphics.getWidth() - textWidth) / 2
 
     -- Draw the rest of the assets
     love.graphics.print("Version: " .. version, 0, love.graphics.getHeight() - 50, 0, 1)
-    love.graphics.print("© 2024 Moonwave Studios. All rights reserved.", love.graphics.getWidth() - 470, love.graphics.getHeight() - 50, 0, 1)
     love.graphics.print(text, x, love.graphics.getHeight() - 50, 0, 1)
 
     -- Draw the menu options if animation is done
