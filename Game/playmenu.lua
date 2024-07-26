@@ -1,9 +1,8 @@
--- playmenu.lua
 local playmenu = {}
 local menu = require("menu")
 local settings = require("settings")
 local RatingEffectImageSize = settings.getRatingSize()
-local selectedOption = 1
+local selectedOption = nil  -- Change to store selected option index
 local options = {}
 local optionsLoaded = false  -- Flag to check if options have been loaded
 local scrollOffset = 0  -- The current scroll offset
@@ -11,6 +10,7 @@ local visibleOptions = 5  -- Number of options visible at a time
 local scoreBreakdown = nil
 local mouseX, mouseY = 0, 0  -- Variables to store mouse coordinates
 local ModifiersButton = love.graphics.newImage("assets/modifiers.png")
+local currentMusic = nil  -- Track the currently playing music
 
 function playmenu.load(breakdown)
     if not optionsLoaded then
@@ -73,8 +73,6 @@ function playmenu.update(dt)
 end
 
 function playmenu.draw()
-    love.graphics.print("Version: " .. version, 0, love.graphics.getHeight() - 50, 0, 1)
-    
     if scoreBreakdown then
         love.graphics.printf("Score Breakdown:", 0, 100, love.graphics.getWidth(), "center")
         love.graphics.printf("Score: " .. scoreBreakdown.score, 0, 150, love.graphics.getWidth(), "center")
@@ -91,8 +89,6 @@ function playmenu.draw()
 
         love.graphics.printf("Press SPACE to continue...", 0, love.graphics.getHeight() - 50, love.graphics.getWidth(), "center")
     else
-        love.graphics.printf("Choose an option:", 0, 100, love.graphics.getWidth(), "center")
-
         local startY = 150
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
             local option = options[i]
@@ -148,10 +144,22 @@ function playmenu.mousepressed(x, y, button)
             local indexClicked = math.floor((y - startY) / 100) + 1 + scrollOffset
 
             if indexClicked >= 1 and indexClicked <= #options then
-                selectedOption = indexClicked
-                local selected = options[selectedOption]
-                menu.stopMusic()
-                startGame(selected.chart, selected.music, selected.background)
+                if selectedOption == indexClicked then
+                    -- If the same map is clicked again, start the game
+                    local selected = options[selectedOption]
+                    stopMusic()
+                    startGame(selected.chart, selected.music, selected.background)
+                else
+                    -- Select a new map and play its music
+                    selectedOption = indexClicked
+                    local selected = options[selectedOption]
+                    menu.stopMusic()
+                    playMusic(selected.music)
+                end
+            else
+                -- Deselect if clicking outside options
+                selectedOption = nil
+                stopMusic()
             end
         end
     end
@@ -161,7 +169,6 @@ function playmenu.mousemoved(x, y, dx, dy, istouch)
     mouseX, mouseY = x, y
 end
 
-
 function playmenu.keypressed(key)
     if scoreBreakdown then
         if key == "space" then
@@ -169,12 +176,32 @@ function playmenu.keypressed(key)
         end
     else
         if key == "return" or key == "space" then
-            local selected = options[selectedOption]
-            menu.stopMusic()
-            startGame(selected.chart, selected.music, selected.background)
+            if selectedOption then
+                local selected = options[selectedOption]
+                stopMusic()
+                startGame(selected.chart, selected.music, selected.background)
+            end
         elseif key == "escape" then
+            stopMusic()
             backToMenu()
         end
+    end
+end
+
+-- Function to play music
+function playMusic(musicPath)
+    if currentMusic then
+        currentMusic:stop()
+    end
+    currentMusic = love.audio.newSource(musicPath, "stream")
+    currentMusic:setLooping(true)
+    currentMusic:play()
+end
+
+-- Function to stop the current music
+function stopMusic()
+    if currentMusic then
+        currentMusic:stop()
     end
 end
 
