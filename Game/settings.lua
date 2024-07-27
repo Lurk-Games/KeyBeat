@@ -1,7 +1,17 @@
 -- settings.lua
 local settings = {}
 
-local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim", "Rating Effect Size", "Fullscreen"}
+-- Define table.indexOf function
+function table.indexOf(t, value)
+    for i, v in ipairs(t) do
+        if v == value then
+            return i
+        end
+    end
+    return nil
+end
+
+local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim", "Rating Effect Size", "Fullscreen", "Language"}
 local selectedOption = 1
 local volume = 1
 local noteSpeed = 300
@@ -11,8 +21,25 @@ local skins = {}
 local selectedSkin = 1
 local backgroundDim = 0.5 -- Default dim value
 local isFullscreen = false -- Default fullscreen value
+local selectedLanguage = "en" -- Default language
 
+local translations = {}
+local languages = {"en", "pl", "de"} -- Available languages
 local json = require("dkjson") -- Load the JSON library
+
+local function loadTranslations()
+    for _, lang in ipairs(languages) do
+        local filePath = "Translations/" .. lang .. ".json"
+        if love.filesystem.getInfo(filePath) then
+            local content = love.filesystem.read(filePath)
+            translations[lang] = json.decode(content)
+        end
+    end
+end
+
+local function getTranslation(key)
+    return translations[selectedLanguage][key] or key
+end
 
 local function saveSettings()
     local data = {
@@ -21,8 +48,9 @@ local function saveSettings()
         noteSize = noteSize,
         selectedSkin = selectedSkin,
         backgroundDim = backgroundDim,
-        RatingEffectImageSize = RatingEffectImageSize, -- Corrected field name
-        isFullscreen = isFullscreen
+        RatingEffectImageSize = RatingEffectImageSize,
+        isFullscreen = isFullscreen,
+        selectedLanguage = selectedLanguage -- Save the selected language
     }
     
     local encodedData = json.encode(data) -- Encode the data as JSON
@@ -47,8 +75,16 @@ local function loadSettings()
                     noteSize = data.noteSize or noteSize
                     selectedSkin = data.selectedSkin or selectedSkin
                     backgroundDim = data.backgroundDim or backgroundDim
-                    RatingEffectImageSize = data.RatingEffectImageSize or RatingEffectImageSize -- Corrected field name
+                    RatingEffectImageSize = data.RatingEffectImageSize or RatingEffectImageSize
                     isFullscreen = data.isFullscreen or isFullscreen
+                    selectedLanguage = data.selectedLanguage or selectedLanguage -- Load the selected language
+                    if selectedLanguage == "jp" then
+                        local japaneseFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
+                        love.graphics.setFont(japaneseFont) -- Set the specific font
+                    else
+                        local originalFont = love.graphics.newFont("Fonts/NotoSans-Regular.ttf", 24)
+                        love.graphics.setFont(originalFont)
+                    end
                 else
                     print("Failed to decode JSON data from decompressed LZ4 data.")
                 end
@@ -63,7 +99,6 @@ local function loadSettings()
     end
 end
 
-
 function settings.load()
     -- Load available skins
     local skinFiles = love.filesystem.getDirectoryItems("skins")
@@ -72,6 +107,7 @@ function settings.load()
             table.insert(skins, skin)
         end
     end
+    loadTranslations()
     loadSettings()
 end
 
@@ -79,7 +115,7 @@ function settings.update(dt)
 end
 
 function settings.draw()
-    love.graphics.printf("Settings:", 0, love.graphics.getHeight() / 2 - 100, love.graphics.getWidth(), "center")
+    love.graphics.printf(getTranslation("Settings") .. ":", 0, love.graphics.getHeight() / 2 - 100, love.graphics.getWidth(), "center")
     
     for i, option in ipairs(options) do
         local value = ""
@@ -90,19 +126,22 @@ function settings.draw()
         elseif option == "Note Size" then
             value = tostring(noteSize)
         elseif option == "Skins" then
-            value = skins[selectedSkin] or "No skins available"
+            value = skins[selectedSkin] or getTranslation("No skins available")
         elseif option == "Background Dim" then
             value = tostring(math.floor(backgroundDim * 100)) .. "%"
         elseif option == "Rating Effect Size" then
             value = tostring(RatingEffectImageSize)
         elseif option == "Fullscreen" then
-            value = isFullscreen and "On" or "Off"
+            value = isFullscreen and getTranslation("On") or getTranslation("Off")
+        elseif option == "Language" then
+            value = selectedLanguage
         end
         
+        local translatedOption = getTranslation(option)
         if i == selectedOption then
-            love.graphics.printf("-> " .. option .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
+            love.graphics.printf("-> " .. translatedOption .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
         else
-            love.graphics.printf(option .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
+            love.graphics.printf(translatedOption .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
         end
     end
 end
@@ -140,6 +179,22 @@ function settings.keypressed(key)
         elseif options[selectedOption] == "Fullscreen" then
             isFullscreen = not isFullscreen
             love.window.setFullscreen(isFullscreen)
+        elseif options[selectedOption] == "Language" then
+            local index = table.indexOf(languages, selectedLanguage)
+            index = index + (key == "left" and -1 or 1)
+            if index < 1 then
+                index = #languages
+            elseif index > #languages then
+                index = 1
+            end
+            selectedLanguage = languages[index]
+            if selectedLanguage == "jp" then
+                local japaneseFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
+                love.graphics.setFont(japaneseFont) -- Set the specific font
+            else
+                local originalFont = love.graphics.newFont("Fonts/NotoSans-Regular.ttf", 24)
+                love.graphics.setFont(originalFont)
+            end
         end
         saveSettings()
     elseif key == "escape" then
@@ -173,6 +228,14 @@ end
 
 function settings.getFullscreen()
     return isFullscreen
+end
+
+function settings.getSelectedLanguage()
+    return selectedLanguage
+end
+
+function settings.getTranslation(key)
+    return getTranslation(key)
 end
 
 return settings
