@@ -5,12 +5,22 @@ local introElapsed = 0
 local introFinished = false
 local alpha = 0
 local introFont -- Declare a variable to hold the font
+local originalFont
+local settings = require("settings")
 
 function intro.load()
+    love.audio.play(introSFX)
     introElapsed = 0
     introFinished = false
 
     introFont = love.graphics.newFont("Fonts/Moderniz.otf", 24)  -- Adjust size as needed
+    -- Load font based on the selected language from settings
+    local language = settings.getSelectedLanguage()
+    if language == "jp" then
+        originalFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
+    else
+        originalFont = love.graphics.newFont("Fonts/NotoSans-Regular.ttf", 24)
+    end
 end
 
 function intro.update(dt)
@@ -44,8 +54,6 @@ function intro.draw()
     -- Center the text horizontally
     local text = "Made by Moonwave Studios"
 
-    -- Set the specific font for this specific text
-    local originalFont = love.graphics.getFont()  -- Store the original font
     love.graphics.setFont(introFont) -- Set the specific font
     local textWidth = introFont:getWidth(text)
     local textX = (screenWidth - textWidth) / 2
