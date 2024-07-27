@@ -1,4 +1,5 @@
 local menu = {}
+local settings = require("settings")
 local selectedOption = 1
 local options = {}
 local menuBackgroundsFolder = "menuBackgrounds"
@@ -23,8 +24,11 @@ local randomTips = {
     "Also try out rhythia",
     "'Click the circles'",
     "osu! is a game about circles",
-    "O CHOLERA, CZY TO FREDDY FAZBEAR?!",
 }
+
+local function getTranslation(key)
+    return settings.getTranslation(key)
+end
 
 -- Function to load songs
 local function loadSongs()
@@ -50,7 +54,7 @@ end
 
 function menu.load()
     randomIndex = love.math.random(1, #randomTips)
-    options = {"Start Game", "Settings", "Credits"}
+    options = {getTranslation("Start Game"), getTranslation("Settings"), getTranslation("Credits")}
     showButtons = false
 
     -- Load all images from the menuBackgrounds folder
@@ -114,11 +118,13 @@ function menu.update(dt)
 end
 
 function menu.draw()
-    local text = randomTips[randomIndex]
-local textWidth = love.graphics.getFont():getWidth(text)
+    local translatedTips = getTranslation(randomTips[randomIndex])
+    local text = translatedTips
+    local textWidth = love.graphics.getFont():getWidth(text)
 
--- Calculate the x-coordinate to center the text
-local x = (love.graphics.getWidth() - textWidth) / 2
+    -- Calculate the x-coordinate to center the text
+    local x = (love.graphics.getWidth() - textWidth) / 2
+
     -- Draw the current background scaled to the window size
     love.graphics.draw(currentBackground, 0, 0, 0, backgroundScaleX, backgroundScaleY)
 
@@ -131,13 +137,15 @@ local x = (love.graphics.getWidth() - textWidth) / 2
     love.graphics.draw(GameLogo, logoX, logoY, logoRotation, logoScale, logoScale, GameLogo:getWidth() / 2, GameLogo:getHeight() / 2)
 
     -- Draw the rest of the assets
-    love.graphics.print("Version: " .. version, 0, love.graphics.getHeight() - 50, 0, 1)
+    local translatedVer = getTranslation("Version: ")
+    love.graphics.print(translatedVer .. version, 0, love.graphics.getHeight() - 50, 0, 1)
     love.graphics.print(text, x, love.graphics.getHeight() - 50, 0, 1)
 
     -- Draw the menu options if animation is done
     if showButtons then
         local mouseX, mouseY = love.mouse.getPosition()
         for i, option in ipairs(options) do
+            local translatedOption = getTranslation(option)
             local optionX = 0
             local optionY = love.graphics.getHeight() / 2 - 50 + i * 30
             local optionWidth = love.graphics.getWidth()
@@ -149,19 +157,19 @@ local x = (love.graphics.getWidth() - textWidth) / 2
             end
 
             if i == selectedOption then
-                love.graphics.printf("-> " .. option, optionX, optionY, optionWidth, "center")
+                love.graphics.printf("-> " .. translatedOption, optionX, optionY, optionWidth, "center")
             else
-                love.graphics.printf(option, optionX, optionY, optionWidth, "center")
+                love.graphics.printf(translatedOption, optionX, optionY, optionWidth, "center")
             end
         end
     end
 
     -- Draw the current song name
     if currentSongName then
-        love.graphics.printf("Now Playing: " .. currentSongName, 0, 0, love.graphics.getWidth(), "center")
+        local translatedNP = getTranslation("Now Playing: ")
+        love.graphics.printf(translatedNP .. currentSongName, 0, 0, love.graphics.getWidth(), "center")
     end
 end
-
 
 function menu.mousepressed(x, y, button)
     if button == 1 then
@@ -184,11 +192,11 @@ function menu.mousepressed(x, y, button)
                 if x >= optionX and x <= optionX + optionWidth and y >= optionY and y <= optionY + optionHeight then
                     selectedOption = i
                     -- Trigger the selected option
-                    if options[selectedOption] == "Start Game" then
+                    if options[selectedOption] == getTranslation("Start Game") then
                         goToPlayMenu()
-                    elseif options[selectedOption] == "Settings" then
+                    elseif options[selectedOption] == getTranslation("Settings") then
                         goToSettings()
-                    elseif options[selectedOption] == "Credits" then
+                    elseif options[selectedOption] == getTranslation("Credits") then
                         goToCredits()
                     end
                 end
@@ -196,7 +204,6 @@ function menu.mousepressed(x, y, button)
         end
     end
 end
-
 
 function menu.keypressed(key)
     if showButtons then
@@ -211,11 +218,11 @@ function menu.keypressed(key)
                 selectedOption = 1
             end
         elseif key == "return" or key == "space" then
-            if options[selectedOption] == "Start Game" then
+            if options[selectedOption] == getTranslation("Start Game") then
                 goToPlayMenu()
-            elseif options[selectedOption] == "Settings" then
+            elseif options[selectedOption] == getTranslation("Settings") then
                 goToSettings()
-            elseif options[selectedOption] == "Credits" then
+            elseif options[selectedOption] == getTranslation("Credits") then
                 goToCredits()
             end
         elseif key == "escape" then
