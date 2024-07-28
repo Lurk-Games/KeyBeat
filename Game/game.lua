@@ -32,6 +32,11 @@ local ratingTextDuration = 0.5 -- Duration for rating text to fade out
 local ratingTextEffects = {}
 local isPaused = false
 
+local health = 100 -- Initial player health
+local maxHealth = 100 -- Maximum health
+local healthLossPerMiss = 10 -- Health lost per miss
+local healthGainPerHit = 1 -- Health gained per hit
+
 local perfectImage
 local goodImage
 local okayImage
@@ -54,6 +59,10 @@ local grades = {
     { grade = "C", minAccuracy = 60, maxAccuracy = 69.99 },
     { grade = "D", maxAccuracy = 59.99 }
 }
+
+local function getTranslation(key)
+    return settings.getTranslation(key)
+end
 
 -- Helper function to calculate grade based on accuracy
 local function calculateGrade(accuracy)
@@ -88,6 +97,8 @@ local function displayScoreBreakdown()
 end
 
 function game.start(chartFile, musicFile, callback, backgroundFile)
+    health = 100
+    isPaused = false
     songTime = 0
     score = 0
     combo = 0
@@ -146,6 +157,12 @@ function game.update(dt)
         return
     end
 
+    if health <= 0 then
+        music:stop()
+        displayScoreBreakdown()
+        return
+    end
+
     local currentTime = love.timer.getTime()
 
     if currentTime >= musicStartTime and not music:isPlaying() then
@@ -168,6 +185,7 @@ function game.update(dt)
             misses = misses + 1
             combo = 0
             love.audio.play(miss)
+            health = health - healthLossPerMiss -- Decrease health on miss
             updateAccuracy()
         end
     end
@@ -260,11 +278,28 @@ function game.draw()
         love.graphics.setColor(1, 1, 1, 1)  -- Reset color
     end
 
-    love.graphics.print("Press any key to hit notes!", 10, 30)
-    love.graphics.print("Score: " .. score, 300, love.graphics.getHeight() - 50)
-    love.graphics.print("Misses: " .. misses, 500, love.graphics.getHeight() - 50)
-    love.graphics.print("Combo: " .. combo, 700, love.graphics.getHeight() - 50)
-    love.graphics.print("Accuracy: " .. string.format("%.2f", accuracy) .. "%", 900, love.graphics.getHeight() - 50)
+    -- Draw the health bar
+    local healthBarWidth = 200
+    local healthBarHeight = 20
+    local healthBarX = 10
+    local healthBarY = love.graphics.getHeight() - 40
+
+    love.graphics.setColor(1, 0, 0) -- Red for health bar background
+    love.graphics.rectangle("fill", healthBarX, healthBarY, healthBarWidth, healthBarHeight)
+
+    love.graphics.setColor(0, 1, 0) -- Green for current health
+    love.graphics.rectangle("fill", healthBarX, healthBarY, healthBarWidth * (health / maxHealth), healthBarHeight)
+
+    love.graphics.setColor(1, 1, 1) -- Reset color
+    love.graphics.rectangle("line", healthBarX, healthBarY, healthBarWidth, healthBarHeight)
+
+    love.graphics.print("Health: " .. health, healthBarX, healthBarY - 30)
+
+    love.graphics.print(getTranslation("Press any key to hit notes!"), 10, 40)
+    love.graphics.print(getTranslation("Score: ") .. score, 300, love.graphics.getHeight() - 50)
+    love.graphics.print(getTranslation("Misses: ") .. misses, 500, love.graphics.getHeight() - 50)
+    love.graphics.print(getTranslation("Combo: ") .. combo, 700, love.graphics.getHeight() - 50)
+    love.graphics.print(getTranslation("Accuracy: ") .. string.format("%.2f", accuracy) .. "%", 900, love.graphics.getHeight() - 50)
 
     -- Draw time bar
     drawTimeBar()
@@ -280,8 +315,19 @@ function drawPause()
     love.graphics.setColor(0, 0, 0, 0.5)
     love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.printf("Paused", 0, windowHeight / 2, windowWidth, "center")
+    love.graphics.printf(getTranslation("Paused"), 0, windowHeight / 2 - 50, windowWidth, "center")
+    
+    -- Draw Return to Menu button
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    local buttonWidth, buttonHeight = 200, 50
+    local buttonX = (windowWidth - buttonWidth) / 2
+    local buttonY = windowHeight / 2 + 50
+    love.graphics.rectangle("fill", buttonX, buttonY, buttonWidth, buttonHeight)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.printf(getTranslation("Return to Menu"), buttonX, buttonY + 15, buttonWidth, "center")
+    love.graphics.setColor(1, 1, 1) -- Reset color
 end
+
 
 function drawTimeBar()
     local screenWidth = love.graphics.getWidth()
@@ -291,7 +337,7 @@ function drawTimeBar()
     love.graphics.rectangle("fill", 0, 0, screenWidth * progress, barHeight)
     love.graphics.setColor(1, 1, 1)
     love.graphics.rectangle("line", 0, 0, screenWidth, barHeight)
-    love.graphics.print("Time: " .. string.format("%.2f", songTime) .. " / " .. string.format("%.2f", chartEndTime), 10, barHeight / 2 - 6)
+    love.graphics.print(getTranslation("Time: ") .. string.format("%.2f", songTime) .. " / " .. string.format("%.2f", chartEndTime), 10, barHeight / 2 + 5)
 end
 
 function game.keypressed(key)
@@ -331,6 +377,7 @@ function game.keypressed(key)
         combo = combo + #hitNotes
         hits = hits + #hitNotes
         love.audio.play(hitsound)
+        health = math.min(health + healthGainPerHit * #hitNotes, maxHealth) -- Increase health on hit
         updateAccuracy()
     end
 end
@@ -346,6 +393,7 @@ function game.keyreleased(key)
                     combo = combo + 1
                     hits = hits + 1
                     love.audio.play(hitsound)
+                    health = math.min(health + healthGainPerHit, maxHealth) -- Increase health on hit
                     updateAccuracy()
                     break
                 end
@@ -354,6 +402,7 @@ function game.keyreleased(key)
         activeHoldNote = nil
     end
 end
+
 
 function addRatingEffect(timingDifference)
     local ratingImage
@@ -408,6 +457,21 @@ function updateAccuracy()
         end
     end
 end
+
+function game.mousepressed(x, y, button)
+    if isPaused then
+        local windowWidth, windowHeight = love.graphics.getDimensions()
+        local buttonWidth, buttonHeight = 200, 50
+        local buttonX = (windowWidth - buttonWidth) / 2
+        local buttonY = windowHeight / 2 + 50
+        
+        if x >= buttonX and x <= buttonX + buttonWidth and y >= buttonY and y <= buttonY + buttonHeight then
+            -- Handle Return to Menu button click
+            goToPlayMenu()
+        end
+    end
+end
+
 
 function pauseGame()
     isPaused = true
