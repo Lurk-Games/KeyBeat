@@ -102,6 +102,8 @@ function love.mousepressed(x, y, button, istouch, presses)
         menu.mousepressed(x,y,button)
     elseif gameState == "game" then
         game.mousepressed(x,y,button)
+    elseif gameState == "settings" then
+        settings.mousepressed(x,y,button)
     end
 end
 
