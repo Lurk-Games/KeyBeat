@@ -11,9 +11,20 @@ function table.indexOf(t, value)
     return nil
 end
 
-local options = {"Volume", "Note Speed", "Note Size", "Skins", "Background Dim", "Rating Effect Size", "Fullscreen", "Language"}
+-- Define categories
+local categories = {"Audio", "Gameplay", "Display", "General"}
+
+-- Update options to include category information
+local options = {
+    Audio = {"Volume"},
+    Gameplay = {"Note Speed", "Note Size", "Skins"},
+    Display = {"Background Dim", "Rating Effect Size", "Fullscreen"},
+    General = {"Language"}
+}
+local selectedCategory = "Audio"
 local selectedOption = 1
 local volume = 1
+local hoveredOption = nil
 local noteSpeed = 300
 local noteSize = 20
 local RatingEffectImageSize = 150
@@ -112,12 +123,28 @@ function settings.load()
 end
 
 function settings.update(dt)
+    local mouseX, mouseY = love.mouse.getPosition()
+    hoveredOption = nil
+    local yPosition = 100
+    for i, option in ipairs(options[selectedCategory]) do
+        if mouseY >= yPosition and mouseY <= yPosition + 50 then
+            hoveredOption = i
+            break
+        end
+        yPosition = yPosition + 50
+    end
 end
 
 function settings.draw()
-    love.graphics.printf(getTranslation("Settings") .. ":", 0, love.graphics.getHeight() / 2 - 100, love.graphics.getWidth(), "center")
-    
-    for i, option in ipairs(options) do
+    love.graphics.setBackgroundColor(0.6, 0, 0.6) -- Dark background
+    love.graphics.setColor(0.4, 0, 0.4)
+    love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 725, love.graphics.getWidth(), love.graphics.getHeight() - 600)
+    love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), love.graphics.getHeight() - 600)
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.printf(getTranslation("Settings") .. ":", 0, 25, love.graphics.getWidth(), "center")
+
+    local yPosition = 100
+    for i, option in ipairs(options[selectedCategory]) do
         local value = ""
         if option == "Volume" then
             value = tostring(math.floor(volume * 100)) .. "%"
@@ -136,68 +163,101 @@ function settings.draw()
         elseif option == "Language" then
             value = selectedLanguage
         end
-        
+
         local translatedOption = getTranslation(option)
         if i == selectedOption then
-            love.graphics.printf("-> " .. translatedOption .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
+            love.graphics.setColor(1, 1, 0) -- Highlight selected option in yellow
+            love.graphics.printf("-> " .. translatedOption .. ": " .. value, 0, yPosition, love.graphics.getWidth(), "center")
+        elseif i == hoveredOption then
+            love.graphics.setColor(0.8, 0.8, 0.8) -- Highlight hovered option in light gray
+            love.graphics.printf(translatedOption .. ": " .. value, 0, yPosition, love.graphics.getWidth(), "center")
         else
-            love.graphics.printf(translatedOption .. ": " .. value, 0, love.graphics.getHeight() / 2 - 50 + i * 30, love.graphics.getWidth(), "center")
+            love.graphics.setColor(1, 1, 1) -- Default color
+            love.graphics.printf(translatedOption .. ": " .. value, 0, yPosition, love.graphics.getWidth(), "center")
+        end
+        yPosition = yPosition + 50
+    end
+
+    -- Draw category buttons at the bottom
+    local buttonY = love.graphics.getHeight() - 70
+    local buttonWidth = love.graphics.getWidth() / #categories
+    for i, category in ipairs(categories) do
+        if category == selectedCategory then
+            love.graphics.setColor(0.8, 0.8, 0.8)
+        else
+            love.graphics.setColor(0.6, 0.6, 0.6)
+        end
+        --love.graphics.rectangle("fill", (i - 1) * buttonWidth, buttonY, buttonWidth, 50)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.printf(getTranslation(category), (i - 1) * buttonWidth, buttonY + 15, buttonWidth, "center")
+    end
+end
+
+function settings.mousepressed(x, y, button)
+    local buttonY = love.graphics.getHeight() - 70
+    if y >= buttonY then
+        local buttonWidth = love.graphics.getWidth() / #categories
+        local index = math.floor(x / buttonWidth) + 1
+        if index >= 1 and index <= #categories then
+            selectedCategory = categories[index]
+            selectedOption = 1 -- Reset to the first option in the new category
+        end
+    elseif hoveredOption then
+        selectedOption = hoveredOption
+        if button == 1 then -- Left mouse button
+            adjustSettingValue("decrease")
+        elseif button == 2 then -- Right mouse button
+            adjustSettingValue("increase")
         end
     end
 end
 
+function adjustSettingValue(direction)
+    local delta = (direction == "increase") and 1 or -1
+    if options[selectedCategory][selectedOption] == "Volume" then
+        volume = math.max(0, math.min(1, volume + delta * 0.1))
+        love.audio.setVolume(volume)
+    elseif options[selectedCategory][selectedOption] == "Note Speed" then
+        noteSpeed = math.max(100, math.min(1000, noteSpeed + delta * 50))
+    elseif options[selectedCategory][selectedOption] == "Note Size" then
+        noteSize = math.max(10, math.min(100, noteSize + delta * 5))
+    elseif options[selectedCategory][selectedOption] == "Skins" then
+        selectedSkin = selectedSkin + delta
+        if selectedSkin < 1 then
+            selectedSkin = #skins
+        elseif selectedSkin > #skins then
+            selectedSkin = 1
+        end
+    elseif options[selectedCategory][selectedOption] == "Background Dim" then
+        backgroundDim = math.max(0, math.min(1, backgroundDim + delta * 0.1))
+    elseif options[selectedCategory][selectedOption] == "Rating Effect Size" then
+        RatingEffectImageSize = math.max(20, RatingEffectImageSize + delta * 10)
+    elseif options[selectedCategory][selectedOption] == "Fullscreen" then
+        isFullscreen = not isFullscreen
+        love.window.setFullscreen(isFullscreen)
+    elseif options[selectedCategory][selectedOption] == "Language" then
+        local index = table.indexOf(languages, selectedLanguage)
+        index = index + delta
+        if index < 1 then
+            index = #languages
+        elseif index > #languages then
+            index = 1
+        end
+        selectedLanguage = languages[index]
+        if selectedLanguage == "jp" then
+            local japaneseFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
+            love.graphics.setFont(japaneseFont) -- Set the specific font
+        else
+            local originalFont = love.graphics.newFont("Fonts/NotoSans-Regular.ttf", 24)
+            love.graphics.setFont(originalFont)
+        end
+    end
+    saveSettings()
+end
+
 function settings.keypressed(key)
-    if key == "up" then
-        selectedOption = selectedOption - 1
-        if selectedOption < 1 then
-            selectedOption = #options
-        end
-    elseif key == "down" then
-        selectedOption = selectedOption + 1
-        if selectedOption > #options then
-            selectedOption = 1
-        end
-    elseif key == "left" or key == "right" then
-        if options[selectedOption] == "Volume" then
-            volume = math.max(0, math.min(1, volume + (key == "left" and -0.1 or 0.1)))
-            love.audio.setVolume(volume)
-        elseif options[selectedOption] == "Note Speed" then
-            noteSpeed = math.max(100, math.min(1000, noteSpeed + (key == "left" and -50 or 50)))
-        elseif options[selectedOption] == "Note Size" then
-            noteSize = math.max(10, math.min(100, noteSize + (key == "left" and -5 or 5)))
-        elseif options[selectedOption] == "Skins" then
-            selectedSkin = selectedSkin + (key == "left" and -1 or 1)
-            if selectedSkin < 1 then
-                selectedSkin = #skins
-            elseif selectedSkin > #skins then
-                selectedSkin = 1
-            end
-        elseif options[selectedOption] == "Background Dim" then
-            backgroundDim = math.max(0, math.min(1, backgroundDim + (key == "left" and -0.1 or 0.1)))
-        elseif options[selectedOption] == "Rating Effect Size" then
-            RatingEffectImageSize = math.max(20, RatingEffectImageSize + (key == "left" and -10 or 10))
-        elseif options[selectedOption] == "Fullscreen" then
-            isFullscreen = not isFullscreen
-            love.window.setFullscreen(isFullscreen)
-        elseif options[selectedOption] == "Language" then
-            local index = table.indexOf(languages, selectedLanguage)
-            index = index + (key == "left" and -1 or 1)
-            if index < 1 then
-                index = #languages
-            elseif index > #languages then
-                index = 1
-            end
-            selectedLanguage = languages[index]
-            if selectedLanguage == "jp" then
-                local japaneseFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
-                love.graphics.setFont(japaneseFont) -- Set the specific font
-            else
-                local originalFont = love.graphics.newFont("Fonts/NotoSans-Regular.ttf", 24)
-                love.graphics.setFont(originalFont)
-            end
-        end
-        saveSettings()
-    elseif key == "escape" then
+    if key == "escape" then
+        love.graphics.setBackgroundColor(0, 0, 0) -- Dark background
         backToMenu()
     end
 end
