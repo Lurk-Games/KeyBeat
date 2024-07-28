@@ -187,7 +187,6 @@ function settings.draw()
         else
             love.graphics.setColor(0.6, 0.6, 0.6)
         end
-        --love.graphics.rectangle("fill", (i - 1) * buttonWidth, buttonY, buttonWidth, 50)
         love.graphics.setColor(1, 1, 1)
         love.graphics.printf(getTranslation(category), (i - 1) * buttonWidth, buttonY + 15, buttonWidth, "center")
     end
