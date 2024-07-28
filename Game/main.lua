@@ -7,6 +7,8 @@ local playmenu = require("playmenu")
 local intro = require("intro")
 local credits = require("credits")
 
+version = "prototype-0.1.4"
+
 gameState = "intro"  -- make gameState global for access in other modules
 
 function love.load()
@@ -15,6 +17,7 @@ function love.load()
     miss = love.audio.newSource("assets/miss.ogg", "static")
     cursor = love.mouse.newCursor("assets/cursor.png", 0, 0)
     logo = love.graphics.newImage("assets/logo.png")
+    introSFX = love.audio.newSource("assets/Intro.mp3", "static")
     intro.load()
     settings.load() -- Load settings, including skins
     love.window.setFullscreen(settings.getFullscreen()) -- Set initial fullscreen state
@@ -97,6 +100,8 @@ function love.mousepressed(x, y, button, istouch, presses)
         playmenu.mousepressed(x, y, button)
     elseif gameState == "menu" then
         menu.mousepressed(x,y,button)
+    elseif gameState == "game" then
+        game.mousepressed(x,y,button)
     end
 end
 
