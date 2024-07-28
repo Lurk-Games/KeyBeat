@@ -12,6 +12,10 @@ local mouseX, mouseY = 0, 0  -- Variables to store mouse coordinates
 local ModifiersButton = love.graphics.newImage("assets/modifiers.png")
 local currentMusic = nil  -- Track the currently playing music
 
+local function getTranslation(key)
+    return settings.getTranslation(key)
+end
+
 function playmenu.load(breakdown)
     if not optionsLoaded then
         loadSongs()
@@ -74,27 +78,37 @@ end
 
 function playmenu.draw()
     if scoreBreakdown then
-        love.graphics.printf("Score Breakdown:", 0, 100, love.graphics.getWidth(), "center")
-        love.graphics.printf("Score: " .. scoreBreakdown.score, 0, 150, love.graphics.getWidth(), "center")
-        love.graphics.printf("Hits: " .. scoreBreakdown.hits, 0, 200, love.graphics.getWidth(), "center")
-        love.graphics.printf("Misses: " .. scoreBreakdown.misses, 0, 250, love.graphics.getWidth(), "center")
-        love.graphics.printf("Accuracy: " .. string.format("%.2f", scoreBreakdown.accuracy) .. "%", 0, 300, love.graphics.getWidth(), "center")
-        love.graphics.printf("Total Notes: " .. scoreBreakdown.totalNotes, 0, 350, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Score Breakdown:"), 0, 100, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Score: ") .. scoreBreakdown.score, 0, 150, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Hits: ") .. scoreBreakdown.hits, 0, 200, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Misses: ") .. scoreBreakdown.misses, 0, 250, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Accuracy: ") .. string.format("%.2f", scoreBreakdown.accuracy) .. "%", 0, 300, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Total Notes: ") .. scoreBreakdown.totalNotes, 0, 350, love.graphics.getWidth(), "center")
         
-        -- Display grade image
         local gradeImage = love.graphics.newImage("skins/default/" .. scoreBreakdown.grade .. ".png")
         local x = love.graphics.getWidth() / 2 - RatingEffectImageSize / 2
-        local y = 400  -- Adjust as needed
+        local y = 400
         love.graphics.draw(gradeImage, x, y, 0, RatingEffectImageSize / gradeImage:getWidth(), RatingEffectImageSize / gradeImage:getHeight())
 
-        love.graphics.printf("Press SPACE to continue...", 0, love.graphics.getHeight() - 50, love.graphics.getWidth(), "center")
+        love.graphics.printf(getTranslation("Press SPACE to continue..."), 0, love.graphics.getHeight() - 50, love.graphics.getWidth(), "center")
     else
+        -- Ensure the color is reset to white before drawing the image
+        love.graphics.setColor(1, 1, 1, 1)
+
+        -- Calculate the scaling factors
+        local desiredWidth = 80
+        local desiredHeight = 80
+        local scaleX = desiredWidth / ModifiersButton:getWidth()
+        local scaleY = desiredHeight / ModifiersButton:getHeight()
+
+        -- Draw the modifier button with scaling
+        love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
+
         local startY = 150
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
             local option = options[i]
             local bgY = startY + (i - scrollOffset - 1) * 100
 
-            -- Determine if the mouse is over this option
             local mouseXCenter = love.mouse.getX()
             local mouseYCenter = love.mouse.getY()
             local optionTopY = bgY
@@ -105,14 +119,12 @@ function playmenu.draw()
             local isMouseOver = mouseXCenter >= optionLeftX and mouseXCenter <= optionRightX and
                                  mouseYCenter >= optionTopY and mouseYCenter <= optionBottomY
 
-            -- Highlight selected option or mouse-over option
             if i == selectedOption or isMouseOver then
                 love.graphics.setColor(0.7, 0.7, 0.7, 1)
             else
                 love.graphics.setColor(1, 1, 1, 1)
             end
 
-            -- Draw option background
             love.graphics.rectangle("fill", love.graphics.getWidth() / 4, bgY, love.graphics.getWidth() / 2, 80)
             
             love.graphics.setColor(0, 0, 0, 1)
