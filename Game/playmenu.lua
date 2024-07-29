@@ -77,7 +77,13 @@ function playmenu.update(dt)
 end
 
 function playmenu.draw()
+    love.graphics.setBackgroundColor(0.2, 0.2, 0.2) -- Dark background
+    love.graphics.setColor(0.1, 0.1, 0.1)
+    love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 725, love.graphics.getWidth(), love.graphics.getHeight() - 600)
+    love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), love.graphics.getHeight() - 600)
+    
     if scoreBreakdown then
+        love.graphics.setColor(1, 1, 1)
         love.graphics.printf(getTranslation("Score Breakdown:"), 0, 100, love.graphics.getWidth(), "center")
         love.graphics.printf(getTranslation("Score: ") .. scoreBreakdown.score, 0, 150, love.graphics.getWidth(), "center")
         love.graphics.printf(getTranslation("Hits: ") .. scoreBreakdown.hits, 0, 200, love.graphics.getWidth(), "center")
@@ -102,9 +108,9 @@ function playmenu.draw()
         local scaleY = desiredHeight / ModifiersButton:getHeight()
 
         -- Draw the modifier button with scaling
-        love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
+        --love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
 
-        local startY = 150
+        local startY = 100
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
             local option = options[i]
             local bgY = startY + (i - scrollOffset - 1) * 100
@@ -152,7 +158,7 @@ function playmenu.mousepressed(x, y, button)
     else
         if button == 1 then  -- Left mouse button
             -- Calculate which option was clicked
-            local startY = 150
+            local startY = 100
             local indexClicked = math.floor((y - startY) / 100) + 1 + scrollOffset
 
             if indexClicked >= 1 and indexClicked <= #options then
