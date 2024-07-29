@@ -21,6 +21,7 @@
     "Now Playing: ": "Läuft gerade: ",
     "What is life?": "Was ist Leben?",
     "Also try out osu!": "Probieren Sie auch osu! aus",
+    "Ado my beloved :DDD": "Ado, mein Geliebter :DDD",
     "osu! is a game about circles": "osu! ist ein Spiel über Kreise",
     "Game Development Team:":"Spieleentwicklungsteam:",
     "Virus - Lead Programmer, Polish Translator and artist": "Virus - Leitender Programmierer, Polnisch-Übersetzer und Künstler",
@@ -43,5 +44,9 @@
     "Time: ": "Zeit: ",
     "Press any key to hit notes!": "Drücken Sie eine beliebige Taste, um Noten zu treffen!",
     "Paused":"Angehalten",
-    "Return to Menu": "Zurück zum Menü"
+    "Return to Menu": "Zurück zum Menü",
+    "Audio": "Audio",
+    "Gameplay": "Spielweise",
+    "Display": "Anzeige",
+    "General": "Allgemein"
 }
