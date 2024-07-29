@@ -20,6 +20,7 @@
     "Version: ": "Wersja: ",
     "Now Playing: ": "Teraz gra: ",
     "What is life?": "Czym jest życie?",
+    "Ado my beloved :DDD": "Ado moja ukochana :DDD",
     "Also try out osu!": "Sprawdź jeszcze osu!",
     "osu! is a game about circles": "osu! to gra o okręgach",
     "Game Development Team:":"Deweloperzy:",
@@ -43,5 +44,9 @@
     "Time: ": "Czas: ",
     "Press any key to hit notes!": "Naciśnij jakikolwiek klawisz aby udeczyć nuty!",
     "Paused":"Zapauzowane",
-    "Return to Menu": "Wróć do menu"
+    "Return to Menu": "Wróć do menu",
+    "Audio": "Dźwięk",
+    "Gameplay": "Rozgrywka",
+    "Display": "Wyświetlacz",
+    "General": "Ogólne"
 }
