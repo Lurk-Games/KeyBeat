@@ -17,6 +17,7 @@
     "Opera GX is cool": "Opera GX is cool",
     "Report any bugs": "Report any bugs",
     "Also try out rhythia": "Also try out rhythia",
+    "Ado my beloved :DDD": "Ado my beloved :DDD",
     "Version: ": "Version: ",
     "Now Playing: ": "Now Playing: ",
     "What is life?": "What is life?",
@@ -43,5 +44,9 @@
     "Press any key to hit notes!": "Press any key to hit notes!",
     "Time: ": "Time: ",
     "Paused":"Paused",
-    "Return to Menu": "Return to Menu"
+    "Return to Menu": "Return to Menu",
+    "Audio": "Audio",
+    "Gameplay": "Gameplay",
+    "Display": "Display",
+    "General": "General"
 }
