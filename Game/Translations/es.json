@@ -43,5 +43,9 @@
     "Press any key to hit notes!": "¡Preciona cualquier letra para tocar las notas!",
     "Time: ": "Tiempo: ",
     "Paused":"Pausado",
-    "Return to Menu": "Vuelve al menú"
+    "Return to Menu": "Vuelve al menú",
+    "Audio": "Audio",
+    "Gameplay": "Como se Juega",
+    "Display": "Mostrar",
+    "General": "General"
 }
