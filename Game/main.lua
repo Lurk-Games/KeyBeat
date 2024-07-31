@@ -7,7 +7,7 @@ local playmenu = require("playmenu")
 local intro = require("intro")
 local credits = require("credits")
 
-version = "prototype-0.1.4"
+version = "prototype-0.1.5"
 
 gameState = "intro"  -- make gameState global for access in other modules
 
