@@ -139,6 +139,12 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     else
         noteSpeed = settings.getNoteSpeed()
     end
+
+    if activeModifiers["Double Time"] then
+        music:setPitch(2)
+    else
+        music:setPitch(1)
+    end
     
     -- Load the selected skin images
     local selectedSkin = settings.getSelectedSkin() or "default"
@@ -159,11 +165,19 @@ function loadChart(filename)
     local chart = love.filesystem.read(filename)
     for line in chart:gmatch("[^\r\n]+") do
         local time, x, holdTime = line:match("([%d%.]+) ([%d%.]+) ([%d%.]+)")
-        time = tonumber(time)
+        if activeModifiers["Double Time"] then
+            time = tonumber(time) / 2
+        else
+            time = tonumber(time)
+        end
         x = tonumber(x)
         holdTime = tonumber(holdTime)
         table.insert(notes, {time = time, x = x, hold = holdTime > 0, holdTime = holdTime})
-        chartEndTime = math.max(chartEndTime, time + holdTime)
+        if activeModifiers["Double Time"] then
+            chartEndTime = math.max(chartEndTime, time + holdTime / 2)
+        else
+            chartEndTime = math.max(chartEndTime, time + holdTime)
+        end
     end
     totalNotes = #notes -- Update total notes count
 end
