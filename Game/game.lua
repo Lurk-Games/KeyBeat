@@ -101,8 +101,10 @@ end
 function game.start(chartFile, musicFile, callback, backgroundFile)
     if activeModifiers["Hard Mode"] then
         healthLossPerMiss = 50
+        healthGainPerHit = 0
     else
         healthLossPerMiss = 10
+        healthGainPerHit = 1
     end
     health = 100
     isPaused = false
@@ -170,6 +172,7 @@ function game.update(dt)
 
     if health <= 0 then
         music:stop()
+        accuracy = 0
         displayScoreBreakdown()
         return
     end
