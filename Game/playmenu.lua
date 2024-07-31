@@ -11,6 +11,12 @@ local scoreBreakdown = nil
 local mouseX, mouseY = 0, 0  -- Variables to store mouse coordinates
 local ModifiersButton = love.graphics.newImage("assets/modifiers.png")
 local currentMusic = nil  -- Track the currently playing music
+local ModifiersVisible = false
+local activeModifiers = {}
+local AllModifiers = {
+    "Hard Mode",
+    "No Fail",
+}
 
 local function getTranslation(key)
     return settings.getTranslation(key)
@@ -98,6 +104,27 @@ function playmenu.draw()
 
         love.graphics.printf(getTranslation("Press SPACE to continue..."), 0, love.graphics.getHeight() - 50, love.graphics.getWidth(), "center")
     else
+        if ModifiersVisible then
+            love.graphics.setColor(0, 0, 0, 0.5)  -- Set color to black with 50% opacity
+            love.graphics.rectangle("fill", love.graphics.getWidth() - 200, 0, 200, love.graphics.getHeight())
+
+            -- Draw the modifier buttons
+            love.graphics.setColor(1, 1, 1, 1)  -- Set color to white
+            local modifierStartY = 100
+            local modifierHeight = 40
+            for i, modifier in ipairs(AllModifiers) do
+                local modifierY = modifierStartY + (i - 1) * (modifierHeight + 10)
+                if activeModifiers[modifier] then
+                    love.graphics.setColor(0.2, 0.8, 0.2, 1)  -- Green for active modifiers
+                else
+                    love.graphics.setColor(1, 1, 1, 1)  -- White for inactive modifiers
+                end
+                love.graphics.rectangle("fill", love.graphics.getWidth() - 190, modifierY, 180, modifierHeight)
+                love.graphics.setColor(0, 0, 0, 1)  -- Black text color
+                love.graphics.printf(modifier, love.graphics.getWidth() - 190, modifierY + 10, 180, "center")
+            end
+        end
+
         -- Ensure the color is reset to white before drawing the image
         love.graphics.setColor(1, 1, 1, 1)
 
@@ -108,7 +135,7 @@ function playmenu.draw()
         local scaleY = desiredHeight / ModifiersButton:getHeight()
 
         -- Draw the modifier button with scaling
-        --love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
+        love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
 
         local startY = 100
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
@@ -157,6 +184,34 @@ function playmenu.mousepressed(x, y, button)
         end
     else
         if button == 1 then  -- Left mouse button
+
+            local modifiersButtonX = 0
+            local modifiersButtonY = love.graphics.getHeight() - 100
+            local modifiersButtonWidth = 80
+            local modifiersButtonHeight = 80
+
+            if x >= modifiersButtonX and x <= modifiersButtonX + modifiersButtonWidth and
+               y >= modifiersButtonY and y <= modifiersButtonY + modifiersButtonHeight then
+                -- Toggle visibility of the modifiers menu
+                ModifiersVisible = not ModifiersVisible
+                return
+            end
+
+            -- Check if any modifier buttons were clicked
+            if ModifiersVisible then
+                local modifierStartY = 100
+                local modifierHeight = 40
+                for i, modifier in ipairs(AllModifiers) do
+                    local modifierY = modifierStartY + (i - 1) * (modifierHeight + 10)
+                    if x >= love.graphics.getWidth() - 190 and x <= love.graphics.getWidth() - 10 and
+                       y >= modifierY and y <= modifierY + modifierHeight then
+                        -- Toggle the active state of the clicked modifier
+                        activeModifiers[modifier] = not activeModifiers[modifier]
+                        return
+                    end
+                end
+            end
+
             -- Calculate which option was clicked
             local startY = 100
             local indexClicked = math.floor((y - startY) / 100) + 1 + scrollOffset
@@ -221,6 +276,10 @@ function stopMusic()
     if currentMusic then
         currentMusic:stop()
     end
+end
+
+function playmenu.getModifiers()
+    return activeModifiers
 end
 
 return playmenu
