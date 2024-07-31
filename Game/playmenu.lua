@@ -17,6 +17,7 @@ local AllModifiers = {
     "Hard Mode",
     "No Fail",
     "Speed x1.5",
+    "Double Time",
 }
 
 local function getTranslation(key)
