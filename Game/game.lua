@@ -1,5 +1,6 @@
 local game = {}
 local settings = require("settings")
+local playmenu = require("playmenu")
 
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
@@ -31,6 +32,7 @@ local missTextEffects = {}
 local ratingTextDuration = 0.5 -- Duration for rating text to fade out
 local ratingTextEffects = {}
 local isPaused = false
+local activeModifiers = playmenu.getModifiers()
 
 local health = 100 -- Initial player health
 local maxHealth = 100 -- Maximum health
@@ -97,6 +99,11 @@ local function displayScoreBreakdown()
 end
 
 function game.start(chartFile, musicFile, callback, backgroundFile)
+    if activeModifiers["Hard Mode"] then
+        healthLossPerMiss = 50
+    else
+        healthLossPerMiss = 10
+    end
     health = 100
     isPaused = false
     songTime = 0
@@ -155,6 +162,10 @@ end
 function game.update(dt)
     if isPaused then
         return
+    end
+
+    if activeModifiers["No Fail"] then
+        health = maxHealth
     end
 
     if health <= 0 then
@@ -315,8 +326,10 @@ function drawPause()
     love.graphics.setColor(0, 0, 0, 0.5)
     love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
     love.graphics.setColor(1, 1, 1)
-    love.graphics.printf(getTranslation("Paused"), 0, windowHeight / 2 - 50, windowWidth, "center")
+    love.graphics.printf(getTranslation("Paused"), 0, 0, windowWidth, "center")
     
+    love.graphics.printf(getTranslation("Press ESC to Resume"), 0, windowHeight / 2 - 50, windowWidth, "center")
+
     -- Draw Return to Menu button
     love.graphics.setColor(0.8, 0.8, 0.8)
     local buttonWidth, buttonHeight = 200, 50
