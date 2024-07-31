@@ -19,6 +19,7 @@ local AllModifiers = {
     "Speed x1.5",
     "Double Time",
 }
+local searchQuery = ""  -- Store the current search query
 
 local function getTranslation(key)
     return settings.getTranslation(key)
@@ -89,7 +90,7 @@ function playmenu.draw()
     love.graphics.setColor(0.1, 0.1, 0.1)
     love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 725, love.graphics.getWidth(), love.graphics.getHeight() - 600)
     love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), love.graphics.getHeight() - 600)
-    
+
     if scoreBreakdown then
         love.graphics.setColor(1, 1, 1)
         love.graphics.printf(getTranslation("Score Breakdown:"), 0, 100, love.graphics.getWidth(), "center")
@@ -127,8 +128,22 @@ function playmenu.draw()
             end
         end
 
-        -- Ensure the color is reset to white before drawing the image
-        love.graphics.setColor(1, 1, 1, 1)
+        -- Draw search bar
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.rectangle("fill", love.graphics.getWidth() / 4, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2, 30)
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.printf(searchQuery, love.graphics.getWidth() / 4 + 5, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2 - 10, "left")
+
+    -- Filtered options based on search query
+    local filteredOptions = {}
+    for _, option in ipairs(options) do
+        if string.find(string.lower(option.name), string.lower(searchQuery)) then
+            table.insert(filteredOptions, option)
+        end
+    end
+
+    -- Ensure the color is reset to white before drawing the image
+    love.graphics.setColor(1, 1, 1, 1)
 
         -- Calculate the scaling factors
         local desiredWidth = 80
@@ -140,8 +155,8 @@ function playmenu.draw()
         love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
 
         local startY = 100
-        for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #options) do
-            local option = options[i]
+        for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #filteredOptions) do
+            local option = filteredOptions[i]
             local bgY = startY + (i - scrollOffset - 1) * 100
 
             local mouseXCenter = love.mouse.getX()
@@ -250,7 +265,9 @@ function playmenu.keypressed(key)
             scoreBreakdown = nil
         end
     else
-        if key == "return" or key == "space" then
+        if key == "backspace" then
+            searchQuery = searchQuery:sub(1, -2)
+        elseif key == "return" or key == "space" then
             if selectedOption then
                 local selected = options[selectedOption]
                 stopMusic()
@@ -261,6 +278,10 @@ function playmenu.keypressed(key)
             backToMenu()
         end
     end
+end
+
+function playmenu.textinput(text)
+    searchQuery = searchQuery .. text
 end
 
 -- Function to play music
