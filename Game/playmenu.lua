@@ -19,7 +19,9 @@ local AllModifiers = {
     "Speed x1.5",
     "Double Time",
 }
-local searchQuery = ""  -- Store the current search query
+local searchQuery = ""  -- Store the search query
+local filteredOptions = {}  -- Store filtered options based on search query
+
 
 local function getTranslation(key)
     return settings.getTranslation(key)
@@ -77,7 +79,9 @@ function loadSongs()
                     end
                 end
             end
-            table.insert(options, {chart = chartPath, music = musicPath, name = folder, credits = credits, difficulty = difficulty, background = backgroundPath})
+            local song = {chart = chartPath, music = musicPath, name = folder, credits = credits, difficulty = difficulty, background = backgroundPath}
+            table.insert(options, song)
+            table.insert(filteredOptions, song)  -- Initialize filteredOptions
         end
     end
 end
@@ -233,16 +237,16 @@ function playmenu.mousepressed(x, y, button)
             local startY = 100
             local indexClicked = math.floor((y - startY) / 100) + 1 + scrollOffset
 
-            if indexClicked >= 1 and indexClicked <= #options then
+            if indexClicked >= 1 and indexClicked <= #filteredOptions then
                 if selectedOption == indexClicked then
                     -- If the same map is clicked again, start the game
-                    local selected = options[selectedOption]
+                    local selected = filteredOptions[selectedOption]
                     stopMusic()
                     startGame(selected.chart, selected.music, selected.background)
                 else
                     -- Select a new map and play its music
                     selectedOption = indexClicked
-                    local selected = options[selectedOption]
+                    local selected = filteredOptions[selectedOption]
                     menu.stopMusic()
                     playMusic(selected.music)
                 end
@@ -267,9 +271,10 @@ function playmenu.keypressed(key)
     else
         if key == "backspace" then
             searchQuery = searchQuery:sub(1, -2)
+            filterOptions()
         elseif key == "return" or key == "space" then
             if selectedOption then
-                local selected = options[selectedOption]
+                local selected = filteredOptions[selectedOption]
                 stopMusic()
                 startGame(selected.chart, selected.music, selected.background)
             end
@@ -282,6 +287,16 @@ end
 
 function playmenu.textinput(text)
     searchQuery = searchQuery .. text
+    filterOptions()
+end
+
+function filterOptions()
+    filteredOptions = {}
+    for _, option in ipairs(options) do
+        if option.name:lower():find(searchQuery:lower()) then
+            table.insert(filteredOptions, option)
+        end
+    end
 end
 
 -- Function to play music
