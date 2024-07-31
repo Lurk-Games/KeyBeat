@@ -106,6 +106,7 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
         healthLossPerMiss = 10
         healthGainPerHit = 1
     end
+
     health = 100
     isPaused = false
     songTime = 0
@@ -132,6 +133,12 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
     RatingEffectImageSize = settings.getRatingSize()
+
+    if activeModifiers["Speed x1.5"] then
+        noteSpeed = noteSpeed * 1.5
+    else
+        noteSpeed = settings.getNoteSpeed()
+    end
     
     -- Load the selected skin images
     local selectedSkin = settings.getSelectedSkin() or "default"
