@@ -107,6 +107,12 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
         healthGainPerHit = 1
     end
 
+    if activeModifiers["No Fail"] then
+        healthLossPerMiss = 0
+    else
+        healthLossPerMiss = 10
+    end
+
     health = 100
     isPaused = false
     songTime = 0
@@ -185,10 +191,6 @@ end
 function game.update(dt)
     if isPaused then
         return
-    end
-
-    if activeModifiers["No Fail"] then
-        health = maxHealth
     end
 
     if health <= 0 then
@@ -508,7 +510,6 @@ function game.mousepressed(x, y, button)
         end
     end
 end
-
 
 function pauseGame()
     isPaused = true
