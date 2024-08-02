@@ -9,6 +9,7 @@ local backgroundScaleX, backgroundScaleY
 local currentMusic
 local currentSongName
 local GameLogo = love.graphics.newImage("assets/GameLogo.png")
+local EnableFPS = settings.getEnableFPS()
 local logoX, logoY
 local logoRotation = 0
 local logoScale = 0.25  -- Scale down the logo
@@ -24,6 +25,7 @@ local randomTips = {
     "Also try out rhythia",
     "'Click the circles'",
     "osu! is a game about circles",
+    "Ado my beloved :DDD",
 }
 
 local function getTranslation(key)
@@ -69,6 +71,8 @@ function menu.load()
     if not currentBackground then
         currentBackground = backgrounds[love.math.random(#backgrounds)]
     end
+
+    EnableFPS = settings.getEnableFPS()
 
     -- Calculate the scale factors
     updateBackgroundScale()
@@ -132,6 +136,10 @@ function menu.draw()
     love.graphics.setColor(0, 0, 0, 0.5)  -- Set color to black with 50% opacity
     love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     love.graphics.setColor(1, 1, 1, 1)  -- Reset color to white with 100% opacity
+
+    if EnableFPS == true then
+        love.graphics.print("FPS: " .. love.timer.getFPS(), 0, 0)
+    end
 
     -- Draw the game logo
     love.graphics.draw(GameLogo, logoX, logoY, logoRotation, logoScale, logoScale, GameLogo:getWidth() / 2, GameLogo:getHeight() / 2)

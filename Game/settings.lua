@@ -1,4 +1,3 @@
--- settings.lua
 local settings = {}
 
 -- Define table.indexOf function
@@ -18,7 +17,7 @@ local categories = {"Audio", "Gameplay", "Display", "General"}
 local options = {
     Audio = {"Volume"},
     Gameplay = {"Note Speed", "Note Size", "Skins"},
-    Display = {"Background Dim", "Rating Effect Size", "Fullscreen"},
+    Display = {"Background Dim", "Rating Effect Size", "Fullscreen", "Enable FPS"},
     General = {"Language"}
 }
 local selectedCategory = "Audio"
@@ -32,10 +31,11 @@ local skins = {}
 local selectedSkin = 1
 local backgroundDim = 0.5 -- Default dim value
 local isFullscreen = false -- Default fullscreen value
+local enableFPS = false -- Default FPS display value
 local selectedLanguage = "en" -- Default language
 
 local translations = {}
-local languages = {"en", "pl", "de"} -- Available languages
+local languages = {"en", "pl", "de", "es"} -- Available languages
 local json = require("dkjson") -- Load the JSON library
 
 local function loadTranslations()
@@ -61,9 +61,10 @@ local function saveSettings()
         backgroundDim = backgroundDim,
         RatingEffectImageSize = RatingEffectImageSize,
         isFullscreen = isFullscreen,
+        enableFPS = enableFPS, -- Save the FPS setting
         selectedLanguage = selectedLanguage -- Save the selected language
     }
-    
+
     local encodedData = json.encode(data) -- Encode the data as JSON
     local byteData = love.data.encode("string", "base64", encodedData) -- Convert JSON string to base64 encoded byte data
     local compressedData = love.data.compress("string", "lz4", byteData) -- Compress the base64 encoded byte data using LZ4
@@ -88,6 +89,7 @@ local function loadSettings()
                     backgroundDim = data.backgroundDim or backgroundDim
                     RatingEffectImageSize = data.RatingEffectImageSize or RatingEffectImageSize
                     isFullscreen = data.isFullscreen or isFullscreen
+                    enableFPS = data.enableFPS or enableFPS -- Load the FPS setting
                     selectedLanguage = data.selectedLanguage or selectedLanguage -- Load the selected language
                     if selectedLanguage == "jp" then
                         local japaneseFont = love.graphics.newFont("Fonts/NotoSansCJKjp-Regular.otf", 24)  -- Adjust size as needed
@@ -136,8 +138,8 @@ function settings.update(dt)
 end
 
 function settings.draw()
-    love.graphics.setBackgroundColor(0.6, 0, 0.6) -- Dark background
-    love.graphics.setColor(0.4, 0, 0.4)
+    love.graphics.setBackgroundColor(0.2, 0.2, 0.2) -- Dark background
+    love.graphics.setColor(0.1, 0.1, 0.1)
     love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 725, love.graphics.getWidth(), love.graphics.getHeight() - 600)
     love.graphics.rectangle("fill", 0, love.graphics.getHeight() - 100, love.graphics.getWidth(), love.graphics.getHeight() - 600)
     love.graphics.setColor(1, 1, 1)
@@ -160,6 +162,8 @@ function settings.draw()
             value = tostring(RatingEffectImageSize)
         elseif option == "Fullscreen" then
             value = isFullscreen and getTranslation("On") or getTranslation("Off")
+        elseif option == "Enable FPS" then
+            value = enableFPS and getTranslation("On") or getTranslation("Off")
         elseif option == "Language" then
             value = selectedLanguage
         end
@@ -234,6 +238,8 @@ function adjustSettingValue(direction)
     elseif options[selectedCategory][selectedOption] == "Fullscreen" then
         isFullscreen = not isFullscreen
         love.window.setFullscreen(isFullscreen)
+    elseif options[selectedCategory][selectedOption] == "Enable FPS" then
+        enableFPS = not enableFPS
     elseif options[selectedCategory][selectedOption] == "Language" then
         local index = table.indexOf(languages, selectedLanguage)
         index = index + delta
@@ -287,6 +293,10 @@ end
 
 function settings.getFullscreen()
     return isFullscreen
+end
+
+function settings.getEnableFPS()
+    return enableFPS
 end
 
 function settings.getSelectedLanguage()

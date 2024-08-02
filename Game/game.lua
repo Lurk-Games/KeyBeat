@@ -5,6 +5,7 @@ local playmenu = require("playmenu")
 local notes = {}
 local noteSpeed = settings.getNoteSpeed()
 local noteSize = settings.getNoteSize()
+local EnableFPS = settings.getEnableFPS()
 local hitboxSize = 40 -- Increase hitbox size without changing note size
 local hitLineY = 500
 local songTime = 0
@@ -139,6 +140,7 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
     RatingEffectImageSize = settings.getRatingSize()
+    EnableFPS = settings.getEnableFPS()
 
     if activeModifiers["Speed x1.5"] then
         noteSpeed = noteSpeed * 1.5
@@ -279,6 +281,10 @@ function game.draw()
     love.graphics.setColor(1, 1, 1, 1) -- Reset color
     
     love.graphics.line(0, hitLineY, love.graphics.getWidth(), hitLineY)
+
+    if EnableFPS == true then
+        love.graphics.print("FPS: " .. love.timer.getFPS(), love.graphics.getWidth() - 100, love.graphics.getHeight() - 50)
+    end
 
     for _, note in ipairs(notes) do
         if note.y then -- Ensure note.y is not nil

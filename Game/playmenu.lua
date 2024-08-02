@@ -10,6 +10,7 @@ local visibleOptions = 5  -- Number of options visible at a time
 local scoreBreakdown = nil
 local mouseX, mouseY = 0, 0  -- Variables to store mouse coordinates
 local ModifiersButton = love.graphics.newImage("assets/modifiers.png")
+local EnableFPS = settings.getEnableFPS()
 local currentMusic = nil  -- Track the currently playing music
 local ModifiersVisible = false
 local activeModifiers = {}
@@ -33,6 +34,7 @@ function playmenu.load(breakdown)
         optionsLoaded = true
     end
     scoreBreakdown = breakdown
+    EnableFPS = settings.getEnableFPS()
 end
 
 function loadSongs()
@@ -157,6 +159,10 @@ function playmenu.draw()
 
         -- Draw the modifier button with scaling
         love.graphics.draw(ModifiersButton, 0, love.graphics.getHeight() - 100, 0, scaleX, scaleY)
+
+        if EnableFPS == true then
+            love.graphics.print("FPS: " .. love.timer.getFPS(), 0, 0)
+        end
 
         local startY = 100
         for i = scrollOffset + 1, math.min(scrollOffset + visibleOptions, #filteredOptions) do
