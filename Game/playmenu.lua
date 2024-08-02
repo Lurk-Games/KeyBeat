@@ -15,10 +15,12 @@ local currentMusic = nil  -- Track the currently playing music
 local ModifiersVisible = false
 local activeModifiers = {}
 local AllModifiers = {
-    "Hard Mode",
+    "Sudden Death",
     "No Fail",
     "Speed x1.5",
-    "Double Time",
+    --"Double Time",
+    "Randomize",
+    "Hidden",
 }
 local searchQuery = ""  -- Store the search query
 local filteredOptions = {}  -- Store filtered options based on search query

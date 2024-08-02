@@ -100,18 +100,20 @@ local function displayScoreBreakdown()
 end
 
 function game.start(chartFile, musicFile, callback, backgroundFile)
-    if activeModifiers["Hard Mode"] then
-        healthLossPerMiss = 50
-        healthGainPerHit = 0
-    else
+    if activeModifiers["Sudden Death"] and not activeModifiers["No Fail"] then
+        healthLossPerMiss = 100
+    elseif not activeModifiers["Sudden Death"] and not activeModifiers["No Fail"] then
         healthLossPerMiss = 10
-        healthGainPerHit = 1
+    elseif activeModifiers["Sudden Death"] and activeModifiers["No Fail"] then
+        healthLossPerMiss = 100
     end
 
-    if activeModifiers["No Fail"] then
+    if activeModifiers["No Fail"] and not activeModifiers["Sudden Death"] then
         healthLossPerMiss = 0
-    else
+    elseif not activeModifiers["No Fail"] and not activeModifiers["Sudden Death"] then
         healthLossPerMiss = 10
+    elseif activeModifiers["No Fail"] and activeModifiers["Sudden Death"] then
+        healthLossPerMiss = 100
     end
 
     health = 100
@@ -173,19 +175,23 @@ function loadChart(filename)
     local chart = love.filesystem.read(filename)
     for line in chart:gmatch("[^\r\n]+") do
         local time, x, holdTime = line:match("([%d%.]+) ([%d%.]+) ([%d%.]+)")
-        if activeModifiers["Double Time"] then
-            time = tonumber(time) / 2
-        else
+        --if activeModifiers["Double Time"] then
+         --   time = tonumber(time) / 2
+        --else
             time = tonumber(time)
+        --end
+        if activeModifiers["Randomize"] then
+            x = math.random(0, love.graphics.getWidth() - 50)
+        else
+            x = tonumber(x)
         end
-        x = tonumber(x)
         holdTime = tonumber(holdTime)
         table.insert(notes, {time = time, x = x, hold = holdTime > 0, holdTime = holdTime})
-        if activeModifiers["Double Time"] then
-            chartEndTime = math.max(chartEndTime, time + holdTime / 2)
-        else
+        --if activeModifiers["Double Time"] then
+          --  chartEndTime = math.max(chartEndTime, time + holdTime / 2)
+        --else
             chartEndTime = math.max(chartEndTime, time + holdTime)
-        end
+        --end
     end
     totalNotes = #notes -- Update total notes count
 end
@@ -280,7 +286,11 @@ function game.draw()
     love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
     love.graphics.setColor(1, 1, 1, 1) -- Reset color
     
-    love.graphics.line(0, hitLineY, love.graphics.getWidth(), hitLineY)
+    if activeModifiers["Hidden"] then
+        -- do nothing
+    else
+        love.graphics.line(0, hitLineY, love.graphics.getWidth(), hitLineY)
+    end
 
     if EnableFPS == true then
         love.graphics.print("FPS: " .. love.timer.getFPS(), love.graphics.getWidth() - 100, love.graphics.getHeight() - 50)
