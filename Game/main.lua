@@ -6,8 +6,10 @@ local settings = require("settings")
 local playmenu = require("playmenu")
 local intro = require("intro")
 local credits = require("credits")
+local charteditor = require("charteditor")
+local joining = require("joining")
 
-version = "prototype-0.1.5"
+version = "BETA"
 
 gameState = "intro"  -- make gameState global for access in other modules
 
@@ -53,6 +55,10 @@ function love.update(dt)
         intro.update(dt)
     elseif gameState == "credits" then
         credits.update(dt)
+    elseif gameState == "charteditor" then
+        charteditor.update(dt)
+    elseif gameState == "joining" then
+        joining.update(dt)
     end
 end
 
@@ -70,6 +76,10 @@ function love.draw()
         intro.draw()
     elseif gameState == "credits" then
         credits.draw()
+    elseif gameState == "charteditor" then
+        charteditor.draw()
+    elseif gameState == "joining" then
+        joining.draw()
     end
 end
 
@@ -95,21 +105,32 @@ function love.keyreleased(key)
     end
 end
 
+
 function love.mousepressed(x, y, button, istouch, presses)
     if gameState == "playmenu" then
         playmenu.mousepressed(x, y, button)
     elseif gameState == "menu" then
-        menu.mousepressed(x,y,button)
+        menu.mousepressed(x, y, button)
     elseif gameState == "game" then
-        game.mousepressed(x,y,button)
+        game.mousepressed(x, y, button)
     elseif gameState == "settings" then
-        settings.mousepressed(x,y,button)
+        settings.mousepressed(x, y, button)
+    elseif gameState == "joining" then
+        joining.mousepressed(x, y, button)
     end
 end
 
 function love.wheelmoved(x, y)
     if gameState == "playmenu" then
         playmenu.wheelmoved(x, y)
+    end
+end
+
+function love.textinput(text) 
+    if gameState == "playmenu" then
+        playmenu.textinput(text)
+    elseif gameState == "charteditor" then
+        charteditor.textinput(text)
     end
 end
 
@@ -138,4 +159,14 @@ end
 function goToCredits()
     gameState = "credits"
     credits.load()
+end
+
+function gotoJoining()
+    gameState = "joining"
+    joining.load()
+end
+
+function goToChartEditor()
+    gameState = "charteditor"
+    charteditor.load()
 end
