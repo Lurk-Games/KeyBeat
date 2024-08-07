@@ -106,14 +106,8 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
         healthLossPerMiss = 10
     elseif activeModifiers["Sudden Death"] and activeModifiers["No Fail"] then
         healthLossPerMiss = 100
-    end
-
-    if activeModifiers["No Fail"] and not activeModifiers["Sudden Death"] then
+    elseif activeModifiers["No Fail"] and not activeModifiers["Sudden Death"] then
         healthLossPerMiss = 0
-    elseif not activeModifiers["No Fail"] and not activeModifiers["Sudden Death"] then
-        healthLossPerMiss = 10
-    elseif activeModifiers["No Fail"] and activeModifiers["Sudden Death"] then
-        healthLossPerMiss = 100
     end
 
     health = 100
@@ -136,8 +130,6 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     ratingTextEffects = {}
     if backgroundFile then
         background = love.graphics.newImage(backgroundFile)
-    else
-        background = nil
     end
     noteSpeed = settings.getNoteSpeed()
     noteSize = settings.getNoteSize()
@@ -168,6 +160,15 @@ function game.start(chartFile, musicFile, callback, backgroundFile)
     goodImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Good.png")
     okayImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Okay.png")
     badImage = love.graphics.newImage("skins/" .. selectedSkin .. "/Bad.png")
+
+    -- Check if the modchart file exists in the same directory as the chart file
+    local chartDirectory = chartFile:match("(.*/)")
+    local modchartFile = chartDirectory and (chartDirectory .. "modchart.lua")
+    if modchartFile and love.filesystem.getInfo(modchartFile) then
+        -- Load and apply the modchart file
+        local modchart = love.filesystem.load(modchartFile)
+        modchart() -- Execute the modchart script
+    end
 end
 
 function loadChart(filename)
