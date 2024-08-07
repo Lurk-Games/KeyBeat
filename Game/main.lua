@@ -96,6 +96,8 @@ function love.keypressed(key)
         intro.keypressed(key)
     elseif gameState == "credits" then
         credits.keypressed(key)
+    elseif gameState == "charteditor" then
+        charteditor.keypressed(key)
     end
 end
 
@@ -117,6 +119,8 @@ function love.mousepressed(x, y, button, istouch, presses)
         settings.mousepressed(x, y, button)
     elseif gameState == "joining" then
         joining.mousepressed(x, y, button)
+    elseif gameState == "charteditor" then
+        charteditor.mousepressed(x, y, button)
     end
 end
 

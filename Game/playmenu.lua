@@ -25,7 +25,6 @@ local AllModifiers = {
 local searchQuery = ""  -- Store the search query
 local filteredOptions = {}  -- Store filtered options based on search query
 
-
 local function getTranslation(key)
     return settings.getTranslation(key)
 end
@@ -59,7 +58,7 @@ function loadSongs()
             musicPath = musicPathOgg
         end
 
-        -- Check if either .png or .jpg file exists
+        -- Check if either .png, .jpg, .jpeg, or .mp4 file exists
         if love.filesystem.getInfo(backgroundPathPng) then
             backgroundPath = backgroundPathPng
         elseif love.filesystem.getInfo(backgroundPathJpg) then
@@ -137,21 +136,21 @@ function playmenu.draw()
         end
 
         -- Draw search bar
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("fill", love.graphics.getWidth() / 4, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2, 30)
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.printf(searchQuery, love.graphics.getWidth() / 4 + 5, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2 - 10, "left")
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.rectangle("fill", love.graphics.getWidth() / 4, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2, 30)
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.printf(searchQuery, love.graphics.getWidth() / 4 + 5, love.graphics.getHeight() - 75, love.graphics.getWidth() / 2 - 10, "left")
 
-    -- Filtered options based on search query
-    local filteredOptions = {}
-    for _, option in ipairs(options) do
-        if string.find(string.lower(option.name), string.lower(searchQuery)) then
-            table.insert(filteredOptions, option)
+        -- Filtered options based on search query
+        local filteredOptions = {}
+        for _, option in ipairs(options) do
+            if string.find(string.lower(option.name), string.lower(searchQuery)) then
+                table.insert(filteredOptions, option)
+            end
         end
-    end
 
-    -- Ensure the color is reset to white before drawing the image
-    love.graphics.setColor(1, 1, 1, 1)
+        -- Ensure the color is reset to white before drawing the image
+        love.graphics.setColor(1, 1, 1, 1)
 
         -- Calculate the scaling factors
         local desiredWidth = 80
